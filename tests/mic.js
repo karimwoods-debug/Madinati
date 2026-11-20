@@ -18,7 +18,11 @@ const FAKE=`(()=>{
 (async()=>{
   const b=await chromium.launch();const p=await (await b.newContext({viewport:{width:400,height:800}})).newPage();
   const errs=[];p.on('pageerror',e=>errs.push(e.message));
-  await p.addInitScript(FAKE);await p.goto('file://'+process.argv[2]);
+  // serve over http (like github.io) so file-specific messages do not apply
+  const html=require('fs').readFileSync(process.argv[2]);
+  const srv=require('http').createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html; charset=utf-8'});r.end(html)});
+  await new Promise(ok=>srv.listen(0,'127.0.0.1',ok));
+  await p.addInitScript(FAKE);await p.goto('http://127.0.0.1:'+srv.address().port+'/');
   const log=(k,v)=>console.log(k.padEnd(40),v);
   const open=async()=>{await p.click('.bld[data-b="madrasa"]');await p.waitForSelector('.act');await p.click('.act:nth-child(1)');await p.waitForSelector('.act');await p.click('.act:nth-child(2)');await p.waitForSelector('#mic')};
   // The first surah in the menu is Al-Fatihah, ayah 1: بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
@@ -41,10 +45,15 @@ const FAKE=`(()=>{
   await p.click('#mic');await p.waitForFunction(()=>!document.querySelector('#mic.live'));
   log('not-allowed message',(await p.textContent('#res')).trim().slice(0,40));
   log('not-allowed sessions',await p.evaluate(()=>window.__sessions));
+  // 3b) Chrome allows the mic but the speech service refuses: show the Android steps
+  await p.evaluate(()=>{navigator.mediaDevices.getUserMedia=async()=>({getTracks:()=>[{stop(){}}]});__plan.length=0;__plan.push({error:'not-allowed'})});
+  await p.click('#mic');await p.waitForFunction(()=>document.querySelector('#res').textContent.includes('mic: ok'));
+  log('service refused message',(await p.textContent('#res')).trim().slice(0,60));
+  log('shows Google app step',(await p.textContent('#res')).includes('Google'));
   // 4) wrong words: graded, not passed
   await p.evaluate(()=>{__plan.length=0;__plan.push({results:[{t:'قل هو',final:true}]})});
   await p.click('#mic');await p.waitForFunction(()=>!document.querySelector('#mic.live'),null,{timeout:8000});
   log('wrong words result',(await p.textContent('#res')).trim().slice(0,30));
-  console.log('page errors:',errs);await b.close();
+  console.log('page errors:',errs);await b.close();srv.close();
   if(errs.length)process.exit(1);
 })().catch(e=>{console.error('FAIL',e.message);process.exit(1)});
