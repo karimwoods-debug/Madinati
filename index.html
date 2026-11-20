@@ -208,7 +208,7 @@ input[type=text]{font:inherit;padding:11px 12px;border:1px solid var(--line);bor
     <button role="tab" data-tab="parents" aria-selected="false">Parents</button>
   </nav>
   <main id="view"></main>
-  <p class="foot">No music, no chat with strangers, no ads. Questions cover the basics, so check anything new with a parent or teacher.</p>
+  <p class="foot">No music, no chat with strangers, no ads. Questions cover the basics, so check anything new with a parent or teacher. <span id="ver"></span></p>
 </div>
 
 <div id="ov" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t">
@@ -218,6 +218,8 @@ input[type=text]{font:inherit;padding:11px 12px;border:1px solid var(--line);bor
 <div id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
+/* Change VERSION on every release, so a cached old copy is easy to spot. */
+const VERSION='2026-11-20.4';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -957,7 +959,7 @@ function micButton(label,expected,onResult){
 }
 function errMsg(c,probe){
   const embedded=window.top!==window, secure=window.isSecureContext!==false, file=location.protocol==='file:', local=file||location.protocol==='content:';
-  const code=` <small>(code: ${esc(c)}, ${esc(lastLog)}${probe?', mic: '+esc(probe):''}, ${embedded?'embedded':'own page'}, ${local?'saved file':'web page'}, ${secure?'secure':'not secure'})</small>`;
+  const code=` <small>(code: ${esc(c)}, ${esc(lastLog)}${probe?', mic: '+esc(probe):''}, ${embedded?'embedded':'own page'}, ${local?'saved file':'web page'}, ${secure?'secure':'not secure'}, v${VERSION})</small>`;
   if(c==='no-speech')return 'I did not hear you. Tap the button, wait a moment, then say it clearly close to the phone.'+code;
   if(c==='language-not-supported')return 'Speech recognition on this device does not have Arabic. Add Arabic in your phone’s voice typing settings (on Android: Google voice typing, Languages), then try again. Your listener can confirm instead.'+code;
   if(c==='network')return 'Speech checking needs an internet connection.'+code;
@@ -1283,5 +1285,6 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='nm'){S.name=e.target.value;save()}});
 renderTop();render();
+$('#ver').textContent='Version '+VERSION+'.';
 </script>
 </body></html>

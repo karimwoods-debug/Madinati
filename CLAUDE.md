@@ -24,6 +24,9 @@ A single-file web game for children aged 6-12. The player walks an avatar around
 - Parent view: the Parents tab, `renderParents`. Read only. It shows totals, the last 7 days, the prayers ticked in Daily deeds, Qur'an recitation and memory counts, quiz best and last scores, and duas practised. `S.hist` keeps one entry per day (finished activity ids with counts, and the deeds ticked) for 60 days. `S.best` holds quiz scores, `S.mem` holds from-memory counts and `S.since` is when history started. History only begins once a save has this version. A print button with `@media print` styles makes the printable progress sheet.
 - `REVIEW.md` lists content added from general knowledge that still needs a teacher or scholar to check it. Matching `REVIEW:` comments mark it in the code.
 
+## Releasing
+- Bump `VERSION` near the top of the script for every change that goes to `main`. It shows in the footer and at the end of every microphone error line, so a phone running a cached old copy is easy to spot.
+
 ## Known limits
 - The microphone check needs a normal https page (or localhost). Chrome refuses it for a file opened from the device (`file://` or `content://`) and inside embedded frames. It also needs an internet connection.
 - The `[hidden]{display:none!important}` rule is required. Without it the closed bottom sheet covers the whole screen.
