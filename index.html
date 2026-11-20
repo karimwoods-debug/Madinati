@@ -142,6 +142,8 @@ input[type=text]{font:inherit;padding:11px 12px;border:1px solid var(--line);bor
 .tap{position:absolute;inset:24px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);font:600 44px var(--display);font-variant-numeric:tabular-nums}
 .tap:active{transform:scale(.97)}
 .seg.wt button{padding:8px 13px}
+.ra{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;min-height:44px;padding:8px 14px}
+.btn.live{background:var(--bad);color:#fff;border-color:var(--bad)}
 .tryrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg);border:2px solid var(--gold);border-radius:12px;padding:10px 12px}
 .tryrow .btn{min-height:44px;padding:8px 16px}
 .w.ok{color:var(--good)}
@@ -344,13 +346,14 @@ const ZONES={
 /* ---------- state ---------- */
 const KEY='madinati-v1';
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
-let S=Object.assign({name:'',gender:'girl',skin:1,garment:'forest',head:'navy',hat:'kufi',hand:'none',back:'none',badge:'none',shoe:'black',sstyle:'shoes',trim:'none',hlen:'regular',vest:'none',pattern:'none',gloves:'none',veil:'none',rec:{},coins:10,stars:0,owned:[],done:{},deeds:{d:'',t:[]},given:0,gfx:'detailed',zone:'old',hist:{},best:{},mem:{},since:''},load());
+let S=Object.assign({name:'',gender:'girl',skin:1,garment:'forest',head:'navy',hat:'kufi',hand:'none',back:'none',badge:'none',shoe:'black',sstyle:'shoes',trim:'none',hlen:'regular',vest:'none',pattern:'none',gloves:'none',veil:'none',rec:{},coins:10,stars:0,owned:[],done:{},deeds:{d:'',t:[]},given:0,gfx:'detailed',zone:'old',hist:{},best:{},mem:{},since:'',sound:'off'},load());
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 if(S.acc){if(S.acc==='quran')S.hand='quran';if(S.acc==='bag'||S.acc==='mat')S.back=S.acc;delete S.acc}
 S.owned=S.owned.map(k=>k.replace(/^acc:quran$/,'hand:quran').replace(/^acc:(bag|mat)$/,'back:$1'));
 if(S.deeds.d!==today())S.deeds={d:today(),t:[]};
 if(!ZONES[S.zone])S.zone='old';
 if(!S.since)S.since=today();
+if(!['off','fx','all'].includes(S.sound))S.sound='off';
 let tab='town', pos='start', zone=S.zone;
 const GFX=()=>S.gfx!=='simple';
 
@@ -434,7 +437,58 @@ function avatar(s){
 
 /* ---------- top bar ---------- */
 function renderTop(){$('#coins').textContent=S.coins;$('#stars').textContent=S.stars}
-function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
+function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200);say(t)}
+
+/* ---------- sound (off by default; S.sound is 'off', 'fx' or 'all') ----------
+   Effects are short single sounds made with Web Audio: no music, no melodies.
+   The narrator uses the browser's text-to-speech in English only. It never reads
+   Arabic script, and callers never pass it Qur'an, dua or dhikr transliterations,
+   because a synthetic voice would teach the wrong pronunciation. */
+let AC=null;
+function actx(){
+  if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;try{AC=new C()}catch(e){return null}}
+  if(AC.state==='suspended')AC.resume();return AC;
+}
+function tone(f1,f2,dur,type,vol,delay=0){
+  const a=actx();if(!a)return;const t=a.currentTime+delay,o=a.createOscillator(),g=a.createGain();
+  o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+.03);
+}
+function hiss(dur,freq,vol,delay=0){
+  const a=actx();if(!a)return;const t=a.currentTime+delay,n=Math.floor(a.sampleRate*dur),buf=a.createBuffer(1,n,a.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);
+  const src=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();
+  src.buffer=buf;f.type='bandpass';f.frequency.value=freq;f.Q.value=1.2;g.gain.value=vol;
+  src.connect(f).connect(g).connect(a.destination);src.start(t);
+}
+const SFX={
+  tap:()=>tone(880,620,.05,'sine',.07),
+  right:()=>tone(520,900,.2,'sine',.12),
+  wrong:()=>tone(240,150,.22,'triangle',.11),
+  coin:()=>tone(1300,1900,.14,'triangle',.07),
+  done:()=>{hiss(.4,4200,.12);tone(600,1000,.35,'sine',.07)},
+  flip:()=>hiss(.06,2000,.25),
+  pick:()=>tone(420,240,.09,'sine',.13),
+  steps:()=>{for(let k=0;k<4;k++)hiss(.05,500,.35,k*.18)},
+  whoosh:()=>hiss(.35,900,.22)
+};
+function sfx(n){if(S.sound==='off'||!SFX[n])return;try{SFX[n]()}catch(e){}}
+const narrOn=()=>S.sound==='all'&&'speechSynthesis' in window;
+function speakable(t){
+  return String(t).replace(/ﷺ/g,', peace be upon him,')
+    .replace(/[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]+/g,' ')
+    .replace(/[“”]/g,'').replace(/\s+([,.!?])/g,'$1').replace(/\s+/g,' ').trim();
+}
+let VOICE=null;
+function pickVoice(){const v=speechSynthesis.getVoices().filter(x=>/^en/i.test(x.lang));VOICE=v.find(x=>x.lang===navigator.language)||v.find(x=>/en-GB/i.test(x.lang))||v[0]||null}
+if('speechSynthesis' in window){try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}}
+function say(...parts){
+  if(!narrOn())return;const t=speakable(parts.filter(Boolean).join('. '));if(!t)return;
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);if(VOICE)u.voice=VOICE;u.lang=VOICE?VOICE.lang:'en-GB';u.rate=.95;u.pitch=1.05;say.last=t;speechSynthesis.speak(u)}catch(e){}
+}
+const SPK='<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-4v12l-4-4H3z" fill="currentColor"/><path d="M13 7a4 4 0 0 1 0 6M15.5 4.5a7.5 7.5 0 0 1 0 11" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>';
+const readBtn=()=>narrOn()?`<button class="btn alt ra" id="ra" aria-label="Read aloud">${SPK} Read aloud</button>`:'';
 
 /* ---------- town art (simple shapes, plus extra layers when graphics are Detailed) ---------- */
 const shadow=(x,y,rx)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${(rx*.1+2).toFixed(1)}" fill="rgba(0,0,0,.13)"/>`;
@@ -599,7 +653,10 @@ function renderTown(fade){
     <p class="hint">Spend coins in the Wardrobe on colours, trim, shoes and accessories. Give some at the Sadaqah Market too.</p></div>
   <div class="card"><h3>Graphics</h3>
     <div class="seg" role="group" aria-label="Graphics"><button data-gfx="detailed" aria-pressed="${D}">Detailed</button><button data-gfx="simple" aria-pressed="${!D}">Simple</button></div>
-    <p class="hint">Simple uses plainer pictures and no moving clouds. It can be faster on older phones.</p></div>`;
+    <p class="hint">Simple uses plainer pictures and no moving clouds. It can be faster on older phones.</p></div>
+  <div class="card"><h3>Sound</h3>
+    <div class="seg" role="group" aria-label="Sound">${[['off','Off'],['fx','Effects'],['all','Effects and narrator']].map(([k,n])=>`<button data-snd="${k}" aria-pressed="${S.sound===k}">${n}</button>`).join('')}</div>
+    <p class="hint">Off by default. Effects are short taps and chimes, never music. The narrator reads questions and instructions in English. It never reads Arabic, so learn the Qur’an and duas from a real teacher.</p></div>`;
 }
 const PLACES={masjid:'Masjid',madrasa:'Madrasa',library:'Library',garden:'Garden of Adab',market:'Sadaqah Market',home:'My Home',wudu:'Wudu Fountain',park:'Play Park',pillars:'Pillars Hall',orchard:'Date Orchard'};
 let walking=false;
@@ -608,23 +665,25 @@ function goPlace(b){
   pos=b; const me=$('#me'); if(!me)return; const [x,y]=Z.spots[b];
   me.style.transform=`translate(${x-22.5}px,${y-68}px) scale(.45)`;
   const delay=matchMedia('(prefers-reduced-motion:reduce)').matches?0:750;
-  walking=true;
+  walking=true;if(delay)sfx('steps');
   setTimeout(()=>{
     walking=false; if(tab!=='town')return;
-    if(b==='gate'){zone=Z.other;S.zone=zone;save();pos='gate';renderTown(true);toast('Welcome to the '+ZONES[zone].n+'!');return}
+    if(b==='gate'){zone=Z.other;S.zone=zone;save();pos='gate';renderTown(true);sfx('whoosh');toast('Welcome to the '+ZONES[zone].n+'!');return}
     openPlace(b);
   },delay);
 }
 
 /* ---------- sheet ---------- */
 let sheetGen=0;
-function openSheet(title){sheetGen++;$('#sh-t').textContent=title;$('#ov').hidden=false;$('#sh-x').focus()}
-function closeSheet(){sheetGen++;$('#ov').hidden=true;if(tab==='town')renderTown()}
+function stopAudio(){if(listen.stop)listen.stop();if(window.speechSynthesis)speechSynthesis.cancel()}
+function openSheet(title){stopAudio();sheetGen++;$('#sh-t').textContent=title;$('#ov').hidden=false;$('#sh-x').focus()}
+function closeSheet(){stopAudio();sheetGen++;$('#ov').hidden=true;if(tab==='town')renderTown()}
 function body(html){const b=$('#sh-b');b.innerHTML=html;return b}
 function menu(title,items){
   openSheet(title);
   const b=body(items.map((it,i)=>`<button class="act" data-i="${i}" style="margin-bottom:10px"><b>${it[0]}</b><span>${it[1]}</span></button>`).join(''));
-  b.querySelectorAll('.act').forEach(btn=>btn.onclick=()=>items[+btn.dataset.i][2]());
+  b.querySelectorAll('.act').forEach(btn=>btn.onclick=()=>{sfx('tap');items[+btn.dataset.i][2]()});
+  say(title,'Choose one: '+items.map(it=>it[0]).join(', '));
 }
 function openPlace(b){
   if(b==='masjid')menu('Masjid',[['Order the prayer','Put one rak\u2019ah in the right order',orderGame],['Salah questions','5 quick questions',()=>quiz('salah')],['Dzikir counter','33, 33 and 34 after prayer',dzikirCounter],['Dzikir check','What the words mean',()=>quiz('dzikir')]]);
@@ -647,7 +706,8 @@ function track(id){
 }
 function reward(id,coins,stars){
   track(id);
-  if(S.done[id]===today())return 'Practice round. You already collected today’s reward here.';
+  if(S.done[id]===today()){sfx('done');return 'Practice round. You already collected today’s reward here.'}
+  sfx('coin');
   S.done[id]=today();S.coins+=coins;S.stars+=stars;save();renderTop();
   return `+${coins} coins, +${stars} stars`;
 }
@@ -659,13 +719,16 @@ function quiz(id,custom){
   const ask=()=>{
     const q=list[i];
     const b=body(`<div class="prog"><span>Question ${i+1} of ${list.length}</span><span>${score} correct</span></div>
-      <p class="q">${esc(q.q)}</p>${q.pre?`<p class="aya" dir="rtl" lang="ar">${esc(q.pre)}</p>`:''}
+      <p class="q">${esc(q.q)}</p>${readBtn()}${q.pre?`<p class="aya" dir="rtl" lang="ar">${esc(q.pre)}</p>`:''}
       <div class="choices ${q.big?'grid':''}">${q.o.map((o,k)=>`<button class="ch ${q.big?'ar':''} ${q.long?'arl':''}" data-k="${k}">${esc(o)}</button>`).join('')}</div><div id="fb"></div>`);
+    const spoken=()=>say(q.q,!q.big&&!q.long?'Is it '+q.o.join(', or ')+'?':'');spoken();
+    if($('#ra'))$('#ra').onclick=spoken;
     b.querySelectorAll('.ch').forEach(btn=>btn.onclick=()=>{
-      const pick=q.o[+btn.dataset.k], ok=pick===q.a;
+      const pick=q.o[+btn.dataset.k], ok=pick===q.a;sfx(ok?'right':'wrong');
       b.querySelectorAll('.ch').forEach(c=>{c.disabled=true;if(q.o[+c.dataset.k]===q.a)c.classList.add('right')});
       if(!ok)btn.classList.add('wrong'); else score++;
       $('#fb').innerHTML=`<p class="fb"><b>${ok?'Masha’Allah, correct!':'Not this time.'}</b> ${esc(q.e)}</p><button class="btn" id="nx" style="margin-top:10px;width:100%">${i+1<list.length?'Next':'See result'}</button>`;
+      say(ok?'Masha Allah, correct!':'Not this time. The answer is '+(q.big||q.long?'shown in green':q.a)+'.',q.e);
       $('#nx').focus();$('#nx').onclick=()=>{i++;i<list.length?ask():finish()};
     });
   };
@@ -674,7 +737,7 @@ function quiz(id,custom){
     S.best[qk]={s:Math.max(bq.s,score),n:list.length,t:bq.t+1,last:score};
     const msg=reward('q:'+qk,score*3,score);
     body(`<p class="big">${score} / ${list.length}</p>
-      <p class="q" style="text-align:center">${score===list.length?'Masha’Allah! Perfect.':score>=list.length/2?'Well done. Keep learning.':'Good effort. Try again to learn more.'}</p>
+      <p class="q" style="text-align:center">${score===list.length?'Masha’Allah! Perfect.':score>=list.length/2?'Well done. Keep learning.':'Good effort. Try again to learn more.'}</p>${(say(`You got ${score} out of ${list.length}`,score===list.length?'Masha Allah! Perfect.':score>=list.length/2?'Well done. Keep learning.':'Good effort. Try again to learn more.'),'')}
       <p class="fb" style="text-align:center">${msg}</p>
       <div class="row"><button class="btn" id="again">Play again</button><button class="btn alt" id="home">Back to town</button></div>`);
     $('#again').onclick=()=>custom?custom.again():quiz(id);$('#home').onclick=closeSheet;
@@ -689,16 +752,18 @@ function letterQuiz(){
 function orderSteps(title,steps,rid,intro,doneHtml,again){
   openSheet(title);
   let next=0; const order=shuffle(steps.map((t,i)=>({t,i})));
-  const b=body(`<p class="hint">${intro}</p>
+  say(title,intro);
+  const b=body(`<p class="hint">${intro}</p>${readBtn()}
     <div class="steps">${order.map(s=>`<button class="step" data-i="${s.i}"><span class="n"></span><span>${esc(s.t)}</span></button>`).join('')}</div><div id="fb"></div>`);
   b.querySelectorAll('.step').forEach(btn=>btn.onclick=()=>{
     const i=+btn.dataset.i;
-    if(i===next){btn.classList.add('ok');btn.disabled=true;btn.querySelector('.n').textContent=++next;
-      if(next===steps.length){const msg=reward(rid,10,5);
+    if(i===next){btn.classList.add('ok');btn.disabled=true;btn.querySelector('.n').textContent=++next;sfx('right');say('Step '+next+'. '+steps[i]);
+      if(next===steps.length){const msg=reward(rid,10,5);setTimeout(()=>say(doneHtml.replace(/<[^>]+>/g,'')),1400);
         $('#fb').innerHTML=`<p class="fb">${doneHtml} ${msg}</p><div class="row" style="margin-top:10px"><button class="btn" id="again">Play again</button><button class="btn alt" id="home">Back to town</button></div>`;
         $('#again').onclick=again;$('#home').onclick=closeSheet;$('#home').focus()}}
-    else{btn.classList.remove('shake');void btn.offsetWidth;btn.classList.add('shake');toast('Not yet. Think about step '+(next+1)+'.')}
+    else{btn.classList.remove('shake');void btn.offsetWidth;btn.classList.add('shake');sfx('wrong');toast('Not yet. Think about step '+(next+1)+'.')}
   });
+  if($('#ra'))$('#ra').onclick=()=>say(intro,'The steps are: '+order.map(o=>o.t).join('. '));
 }
 const orderGame=()=>orderSteps('Order the prayer',PRAYER_STEPS,'order','Tap the steps of one rak’ah in the right order, starting with the first.','<b>Masha’Allah, that is one rak’ah!</b> Ask your teacher to show you the full prayer.',orderGame);
 const wuduGame=()=>orderSteps('Steps of wudu',WUDU_STEPS,'wudu','Tap the steps of wudu in the right order, starting with the first.','<b>Masha’Allah, your wudu is complete!</b> Ask a parent or teacher to show you each step with real water.',wuduGame);
@@ -717,6 +782,7 @@ function duaCard(d,isToday){
     <p class="note">We say it ${esc(d.when)}. Learn how to say it from a parent or teacher, then practise here.</p>
     <div class="row"><button class="btn" id="pr">Practise saying it</button><button class="btn alt" id="home">${isToday?'Back to town':'All duas'}</button></div>`);
   $('#pr').onclick=()=>recite(d.id);$('#home').onclick=isToday?closeSheet:duaList;
+  say((isToday?'The dua of the day is for: ':'The dua for: ')+d.n,'It means: '+d.m,'We say it '+d.when+'. Ask a parent or teacher to teach you how to say it.');
 }
 function duaList(){
   menu('All duas',DUAS.map(d=>[d.n+(d===todayDua()?' (today)':''),`We say it ${d.when}.`,()=>duaCard(d,false)]));
@@ -736,19 +802,20 @@ function matchGame(){
   const b=body(`<p class="hint">Turn over two cards. Find each Arabic letter and its name.</p>
     <div class="prog"><span>Pairs found: <b id="pf">0</b> of ${N}</span><span>Turns: <b id="mv">0</b></span></div>
     <div class="mgrid">${cards.map((c,i)=>`<button class="mc" data-i="${i}" aria-label="Hidden card ${i+1}">${STAR}</button>`).join('')}</div><div id="fb"></div>`);
-  const el=i=>b.querySelector(`.mc[data-i="${i}"]`);
+  const el=i=>b.querySelector(`.mc[data-i="${i}"]`);say('Letter match. Turn over two cards. Find each Arabic letter and its name.');
   const show=(i,up)=>{const e=el(i),c=cards[i];e.classList.toggle('up',up);e.classList.toggle('ar',up&&!!c.ar);e.innerHTML=up?esc(c.t):STAR;e.setAttribute('aria-label',up?c.t:'Hidden card '+(i+1));if(up&&c.ar)e.setAttribute('lang','ar');else e.removeAttribute('lang')};
   b.querySelectorAll('.mc').forEach(e=>e.onclick=()=>{
     const i=+e.dataset.i,c=cards[i]; if(lock||c.done||open.includes(i))return;
-    show(i,true);open.push(i); if(open.length<2)return;
+    show(i,true);open.push(i);sfx('flip');if(!c.ar)say(c.t);if(open.length<2)return;
     moves++;$('#mv').textContent=moves;
     const [a,z]=open;
     if(cards[a].p===cards[z].p){
-      cards[a].done=cards[z].done=true;[a,z].forEach(k=>{el(k).classList.add('done');el(k).disabled=true});open=[];found++;$('#pf').textContent=found;
+      sfx('right');cards[a].done=cards[z].done=true;[a,z].forEach(k=>{el(k).classList.add('done');el(k).disabled=true});open=[];found++;$('#pf').textContent=found;
       if(found===N){const msg=reward('match',8,3);
+        say(`Masha Allah, you found them all in ${moves} turns!`);
         $('#fb').innerHTML=`<p class="fb"><b>Masha’Allah, you found them all in ${moves} turns!</b> ${msg}</p><div class="row" style="margin-top:10px"><button class="btn" id="again">Play again</button><button class="btn alt" id="home">Back to town</button></div>`;
         $('#again').onclick=matchGame;$('#home').onclick=closeSheet;$('#home').focus()}
-    }else{lock=true;setTimeout(()=>{if(gen!==sheetGen)return;show(a,false);show(z,false);open=[];lock=false},900)}
+    }else{lock=true;setTimeout(()=>{if(gen!==sheetGen)return;sfx('wrong');show(a,false);show(z,false);open=[];lock=false},900)}
   });
 }
 
@@ -771,13 +838,14 @@ function harvest(){
     </svg><div id="fb"></div>`);
   const tapDate=g=>{
     const i=+g.dataset.i; if(g.classList.contains('fall'))return;
-    if(!ripe.has(i)){g.classList.remove('shake');void g.getBBox();g.classList.add('shake');toast('That one is still green. Let it ripen.');return}
-    g.classList.add('fall');g.removeAttribute('tabindex');setTimeout(()=>g.remove(),matchMedia('(prefers-reduced-motion:reduce)').matches?0:500);
+    if(!ripe.has(i)){g.classList.remove('shake');void g.getBBox();g.classList.add('shake');sfx('wrong');toast('That one is still green. Let it ripen.');return}
+    sfx('pick');g.classList.add('fall');g.removeAttribute('tabindex');setTimeout(()=>g.remove(),matchMedia('(prefers-reduced-motion:reduce)').matches?0:500);
     got++;$('#got').textContent=got;
-    if(got===ripeN){const msg=reward('harvest',6,2);
+    if(got===ripeN){const msg=reward('harvest',6,2);say(`Masha Allah, you picked ${ripeN} dates! Sharing food with family and neighbours is a good deed.`);
       $('#fb').innerHTML=`<p class="fb"><b>Masha’Allah, you picked ${ripeN} dates!</b> Sharing food with family and neighbours is a good deed. ${msg}</p><div class="row" style="margin-top:10px"><button class="btn" id="again">Pick again</button><button class="btn alt" id="home">Back to town</button></div>`;
       $('#again').onclick=harvest;$('#home').onclick=closeSheet;$('#home').focus()}
   };
+  say(`Date harvest. Pick the ${ripeN} ripe brown dates. Leave the green ones on the tree to grow.`);
   const svg=b.querySelector('.palm');
   svg.addEventListener('click',e=>{const g=e.target.closest('.dt');if(g)tapDate(g)});
   svg.addEventListener('keydown',e=>{const g=e.target.closest('.dt');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();tapDate(g)}});
@@ -816,39 +884,78 @@ function alignWords(expected,heard){
   return {ok,score:n?ok.filter(Boolean).length/n:0};
 }
 function grade(expected,alts){let best={ok:[],score:-1};for(const a of alts){const r=alignWords(expected,a);if(r.score>best.score)best=r}return best}
-let lastGum='';
-async function listen(done){
+/* Android Chrome often ends a recognition session at once, before the child speaks.
+   So keep restarting until we hear something, then keep going until a short silence.
+   Recognition asks for the microphone itself: opening it first with getUserMedia
+   can make Android end the session straight away. */
+let lastLog='';
+function listen(done,opt={}){
   if(!SRC){done({err:'unsupported'});return}
-  const gen=sheetGen;
-  lastGum='skipped';
-  try{
-    if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
-      const st=await navigator.mediaDevices.getUserMedia({audio:true});
-      st.getTracks().forEach(t=>t.stop());lastGum='ok';
-    }
-  }catch(e){lastGum='denied-'+(e&&e.name||'error')}
-  if(gen!==sheetGen)return;
-  if(lastGum.startsWith('denied')){done({err:'not-allowed'});return}
-  let fin=false,rec;
-  const end=r=>{if(fin)return;fin=true;try{rec&&rec.abort()}catch(e){}if(gen===sheetGen)done(r)};
-  try{rec=new SRC()}catch(e){end({err:'unsupported'});return}
-  rec.lang='ar-SA';rec.interimResults=false;rec.maxAlternatives=3;rec.continuous=false;
-  rec.onresult=e=>end({alts:[...e.results[0]].map(a=>a.transcript)});
-  rec.onerror=e=>end({err:e.error});
-  rec.onend=()=>end({err:'no-speech'});
-  try{rec.start()}catch(e){end({err:'unsupported'});return}
-  setTimeout(()=>end({err:'no-speech'}),20000);
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  const gen=sheetGen,t0=Date.now(),LIMIT=opt.limit||25000,log=[];
+  let fin=false,rec=null,segs=[],interim='',gotNew=false,sessions=0,idle=0,cap=0;
+  const text=()=>[...segs.map(a=>a[0]),interim].join(' ').trim();
+  const alts=()=>{const t=text();if(!t)return null;const out=[t];
+    for(let k=1;k<3;k++)if(segs.some(a=>a[k]))out.push([...segs.map(a=>a[k]||a[0]),interim].join(' ').trim());return out};
+  const finish=err=>{
+    if(fin)return;fin=true;clearTimeout(cap);clearTimeout(idle);listen.stop=null;
+    try{rec&&rec.abort()}catch(e){}
+    lastLog=log.slice(-8).join(',')+' x'+sessions;
+    if(gen!==sheetGen)return;
+    const a=alts();done(a?{alts:a}:{err:err||'no-speech'});
+  };
+  const HARD=['not-allowed','service-not-allowed','audio-capture','network','language-not-supported','bad-grammar'];
+  const start=()=>{
+    if(fin)return;sessions++;gotNew=false;
+    try{rec=new SRC()}catch(e){finish('unsupported');return}
+    rec.lang='ar-SA';rec.interimResults=true;rec.maxAlternatives=3;rec.continuous=false;
+    rec.onresult=e=>{
+      clearTimeout(idle);interim='';
+      for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];
+        if(r.isFinal){segs.push([...r].map(x=>x.transcript));gotNew=true}else interim+=r[0].transcript+' '}
+      interim=interim.trim();if(interim)gotNew=true;
+      if(opt.onHear)opt.onHear(text());
+      if(opt.enough&&opt.enough(text()))finish();
+    };
+    rec.onerror=e=>{log.push(e.error);if(HARD.includes(e.error))finish(e.error)};
+    rec.onend=()=>{
+      log.push('end');if(fin)return;
+      if(interim){segs.push([interim]);interim=''}
+      const more=Date.now()-t0<LIMIT&&sessions<20;
+      if(!text()){more?setTimeout(start,120):finish('no-speech');return}
+      if(gotNew&&more){setTimeout(start,120);clearTimeout(idle);idle=setTimeout(()=>finish(),2500);return}
+      finish();
+    };
+    try{rec.start();log.push('start')}catch(e){finish('unsupported')}
+  };
+  cap=setTimeout(()=>finish(),LIMIT);
+  listen.stop=()=>finish();
+  start();
+}
+/* one microphone button: tap to start, tap again to finish early */
+function micButton(label,expected,onResult){
+  const m=$('#mic'),res=$('#res');
+  m.onclick=()=>{
+    if(listen.stop){listen.stop();return}
+    m.textContent='Listening… tap when you finish';m.classList.add('live');m.setAttribute('aria-pressed','true');
+    sfx('tap');
+    res.innerHTML='<p class="fb">Listening. Say it now.</p>';
+    listen(r=>{
+      m.textContent=label;m.classList.remove('live');m.setAttribute('aria-pressed','false');
+      if(r.err){res.innerHTML=`<p class="fb">${errMsg(r.err)}</p>`;sfx('wrong');return}
+      const g=grade(expected,r.alts);sfx(g.score>=PASS?'right':'wrong');onResult(g);
+    },{enough:t=>grade(expected,[t]).score>=1,onHear:t=>{const n=norm(t).length;res.innerHTML=`<p class="fb">Listening… I have heard ${n} word${n===1?'':'s'} so far.</p>`}});
+  };
 }
 function errMsg(c){
   const embedded=window.top!==window, secure=window.isSecureContext!==false, file=location.protocol==='file:', local=file||location.protocol==='content:';
-  const code=` <small>(code: ${esc(c)}, mic: ${esc(lastGum)}, ${embedded?'embedded':'own page'}, ${local?'saved file':'web page'}, ${secure?'secure':'not secure'})</small>`;
-  if(c==='no-speech')return 'I did not hear you. Tap the button and try again.';
+  const code=` <small>(code: ${esc(c)}, ${esc(lastLog)}, ${embedded?'embedded':'own page'}, ${local?'saved file':'web page'}, ${secure?'secure':'not secure'})</small>`;
+  if(c==='no-speech')return 'I did not hear you. Tap the button, wait a moment, then say it clearly close to the phone.'+code;
+  if(c==='language-not-supported')return 'Speech recognition on this device does not have Arabic. Add Arabic in your phone’s voice typing settings (on Android: Google voice typing, Languages), then try again. Your listener can confirm instead.'+code;
   if(c==='network')return 'Speech checking needs an internet connection.'+code;
   if(embedded)return 'This page is shown inside another page, and Chrome blocks the microphone there. Your listener can confirm instead. To use the microphone, open Madinati at its own https address.'+code;
   if(!secure)return 'Chrome only allows the microphone on secure https pages. Your listener can confirm instead. To use the microphone, put Madinati on a free https host.'+code;
   if(local)return 'Chrome does not give the microphone to a page opened from your Files or Downloads app. This is a Chrome rule, not a setting you can change. Your listener can confirm instead. To use the microphone, put Madinati on a free https web address.'+code;
-  if(lastGum.startsWith('denied'))return 'The microphone permission was refused. Tap the lock icon next to the web address, allow Microphone, then reload the page. Your listener can confirm instead.'+code;
-  if((c==='not-allowed'||c==='service-not-allowed')&&lastGum==='ok'&&file)return 'Chrome allowed the microphone but still blocks speech recognition for a page saved on your device. Put Madinati on a free https host to use the microphone. Your listener can confirm instead.'+code;
   if(c==='not-allowed'||c==='audio-capture')return 'The microphone is blocked. Tap the lock icon next to the web address, allow Microphone, then reload the page. Your listener can confirm instead.'+code;
   if(c==='service-not-allowed'||c==='unsupported')return 'Speech recognition is not available in this browser. Your listener can confirm instead.'+code;
   return 'I could not check that. Try again, or ask your listener.'+code;
@@ -874,19 +981,14 @@ function recite(sid){
       <p class="hint">Or read it out loud and ask a listener to tick what they heard.</p>
       <div class="group">${CHK.map((t,k)=>`<button class="deed chk" role="checkbox" aria-checked="false" data-ck="${k}"><span class="box">${TICK}</span><span class="t">${t}</span></button>`).join('')}</div>
       <button class="btn" id="ok" disabled>${sr.dua?'Done':'Next'}</button>`);
+    say(sr.dua?'Say the dua out loud, then tap record. Or ask a listener to tick what they heard.':`Ayah ${i+1} of ${sr.a.length}. Read it out loud, then tap record. Or ask a listener to tick what they heard.`);
     const upd=()=>{$('#ok').disabled=!(micPass||b.querySelectorAll('[data-ck][aria-checked="true"]').length>=CHK.length)};
     b.querySelectorAll('[data-ck]').forEach(el=>el.onclick=()=>{el.setAttribute('aria-checked',String(el.getAttribute('aria-checked')!=='true'));upd()});
-    $('#mic').onclick=()=>{
-      const m=$('#mic');m.disabled=true;m.textContent='Listening... recite now';
-      listen(r=>{
-        m.disabled=false;m.textContent='Record with microphone';
-        if(r.err){$('#res').innerHTML=`<p class="fb">${errMsg(r.err)}</p>`;return}
-        const g=grade(sr.a[i],r.alts);$('#ay').innerHTML=wordsHtml(sr.a[i],g.ok);
-        micPass=g.score>=PASS;
-        $('#res').innerHTML=`<p class="fb"><b>${micPass?'Masha’Allah, I heard it clearly.':'Not clear yet.'}</b> ${g.ok.filter(Boolean).length} of ${g.ok.length} words matched. ${micPass?'':'Green words matched. Try again.'}</p>`;
-        upd();
-      });
-    };
+    micButton('Record with microphone',sr.a[i],g=>{
+      $('#ay').innerHTML=wordsHtml(sr.a[i],g.ok);micPass=g.score>=PASS;
+      $('#res').innerHTML=`<p class="fb"><b>${micPass?'Masha’Allah, I heard it clearly.':'Not clear yet.'}</b> ${g.ok.filter(Boolean).length} of ${g.ok.length} words matched. ${micPass?'':'Green words matched. Try again.'}</p>`;
+      upd();
+    });
     $('#ok').onclick=()=>{i++;i<sr.a.length?show():done()};
   };
   const done=()=>{
@@ -911,22 +1013,17 @@ function memCheck(sid){
       <p class="hint">Say this ayah from memory without looking. The words appear after you try.</p>
       <div class="row"><button class="btn" id="mic">Record from memory</button><button class="btn alt" id="hint">First word</button><button class="btn alt" id="rev">Show the ayah</button></div>
       <div id="res"></div><div id="lis"></div><button class="btn" id="ok" disabled>Next</button>`);
-    const ok=()=>{$('#ok').disabled=!pass};
+    const ok=()=>{$('#ok').disabled=!pass};say(`Ayah ${i+1} of ${sr.a.length}. Say it from memory without looking, then tap record.`);
     $('#hint').onclick=()=>{$('#ay').textContent=ay.split(' ')[0]+' …'};
     $('#rev').onclick=()=>{
       $('#ay').textContent=ay;
       $('#lis').innerHTML=`<p class="hint">Listener: did they say it without looking?</p><button class="deed chk" role="checkbox" aria-checked="false" id="lk"><span class="box">${TICK}</span><span class="t">Yes, they said it from memory</span></button>`;
       $('#lk').onclick=e=>{const c=e.currentTarget;c.setAttribute('aria-checked',String(c.getAttribute('aria-checked')!=='true'));pass=c.getAttribute('aria-checked')==='true';ok()};
     };
-    $('#mic').onclick=()=>{
-      const m=$('#mic');m.disabled=true;m.textContent='Listening... say it now';
-      listen(r=>{
-        m.disabled=false;m.textContent='Record from memory';
-        if(r.err){$('#res').innerHTML=`<p class="fb">${errMsg(r.err)}</p>`;return}
-        const g=grade(ay,r.alts);$('#ay').innerHTML=wordsHtml(ay,g.ok);pass=g.score>=PASS;
-        $('#res').innerHTML=`<p class="fb"><b>${pass?'Masha’Allah, you remembered it!':'Almost.'}</b> ${g.ok.filter(Boolean).length} of ${g.ok.length} words matched. ${pass?'':'Green words matched. Read the ayah, then try again.'}</p>`;ok();
-      });
-    };
+    micButton('Record from memory',ay,g=>{
+      $('#ay').innerHTML=wordsHtml(ay,g.ok);pass=g.score>=PASS;
+      $('#res').innerHTML=`<p class="fb"><b>${pass?'Masha’Allah, you remembered it!':'Almost.'}</b> ${g.ok.filter(Boolean).length} of ${g.ok.length} words matched. ${pass?'':'Green words matched. Read the ayah, then try again.'}</p>`;ok();
+    });
     $('#ok').onclick=()=>{i++;i<sr.a.length?show():done()};
   };
   const done=()=>{
@@ -952,7 +1049,7 @@ function dzikirCounter(){
     $('#tap').onclick=()=>{
       const now=performance.now();
       if(now-last<350){toast('Take your time. Say it first, then tap.');return}
-      last=now;c++;
+      last=now;c++;sfx('tap');
       if(c>=d.n){if(st<2){st++;c=0;toast('Step done. Next dhikr!');draw()}else finish()}else draw();
     };
     $('#tap').focus();
@@ -1002,7 +1099,7 @@ function market(){
       <p class="note">You have ${S.coins} coins. You earn a star every time you give.</p>`);
     b.querySelectorAll('[data-g]').forEach(btn=>btn.onclick=()=>{
       const n=+btn.dataset.g; if(S.coins<n)return;
-      const before=Math.floor(S.given/50); S.coins-=n;S.given+=n;S.stars+=1;track('give');renderTop();
+      const before=Math.floor(S.given/50); S.coins-=n;S.given+=n;S.stars+=1;track('give');sfx('coin');renderTop();
       if(Math.floor(S.given/50)>before)toast('A new well was built. Jazakallahu khayran!');
       draw();
     });
@@ -1057,12 +1154,12 @@ function pick(k,v){
   if(k==='skin')v=+v;
   const item=itemOf(k,v),o=OWN[k];
   if(item&&!owned(o[0]+':'+v,item.cost)){trial[k]=v;renderWardrobe();return}
-  delete trial[k];S[k]=v;save();renderTop();renderWardrobe();
+  sfx('tap');delete trial[k];S[k]=v;save();renderTop();renderWardrobe();
 }
 function buy(k){
   const v=trial[k],item=itemOf(k,v);if(!item)return;
   if(S.coins<item.cost){toast('You need '+(item.cost-S.coins)+' more coins. Try a quiz or Daily deeds.');return}
-  S.coins-=item.cost;S.owned.push(OWN[k][0]+':'+v);S[k]=v;delete trial[k];save();renderTop();renderWardrobe();toast(item.n+' unlocked!');
+  sfx('coin');S.coins-=item.cost;S.owned.push(OWN[k][0]+':'+v);S[k]=v;delete trial[k];save();renderTop();renderWardrobe();toast(item.n+' unlocked!');
 }
 function tryBar(){
   const ks=Object.keys(trial);
@@ -1083,7 +1180,7 @@ function renderDeeds(){
 function toggleDeed(id){
   const t=S.deeds.t,i=t.indexOf(id);
   if(i<0){t.push(id);S.coins+=3}else{t.splice(i,1);S.coins=Math.max(0,S.coins-3)}
-  dayLog().d=t.slice();save();renderTop();renderDeeds();
+  dayLog().d=t.slice();sfx(i<0?'coin':'tap');save();renderTop();renderDeeds();
 }
 
 /* ---------- parent view (read only) ---------- */
@@ -1155,9 +1252,10 @@ function render(){
   ({town:renderTown,wardrobe:renderWardrobe,deeds:renderDeeds,parents:renderParents})[tab]();
 }
 document.addEventListener('click',e=>{
-  const t=e.target.closest('.tabs button');if(t){tab=t.dataset.tab;render();return}
+  const t=e.target.closest('.tabs button');if(t){tab=t.dataset.tab;sfx('tap');stopAudio();render();return}
   const b=e.target.closest('.bld');if(b&&tab==='town'){goPlace(b.dataset.b);return}
   const z=e.target.closest('#view [data-z]');if(z){if(z.dataset.z!==zone)goPlace('gate');return}
+  const sn=e.target.closest('#view [data-snd]');if(sn){S.sound=sn.dataset.snd;save();renderTown();sfx('right');say('The narrator is on. I will read the questions to you.');return}
   const gx=e.target.closest('#view [data-gfx]');if(gx){S.gfx=gx.dataset.gfx;save();renderTown();return}
   const bu=e.target.closest('#view [data-buy]');if(bu){buy(bu.dataset.buy);return}
   const rm=e.target.closest('#view [data-rm]');if(rm){delete trial[rm.dataset.rm];renderWardrobe();return}
