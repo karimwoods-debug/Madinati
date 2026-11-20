@@ -10,14 +10,16 @@ A single-file web game for children aged 6-12. The player walks an avatar around
 - Quiz and Arabic content must be reviewed by a teacher or scholar before children use it. Do not add content from memory without flagging it for review.
 
 ## How the file is organised (search for these comment banners)
-- Data constants near the top of the script: `COLORS`, `SHOES`, `HAND`, `BACK`, `BADGE`, `TRIM`, `PATTERN`, `HATS`, `HLEN`, `GLOVES`, `VEIL`, `DECKS` (quiz decks), `SURAHS` (Arabic ayat for recitation and hifz), `DZIKIR`.
-- `S`: saved game state (name, outfit choices, coins, stars, owned items, daily deeds, recitation counts). Saved under the `madinati-v1` key. Old saves are migrated near where `S` is created.
-- `avatar(s)`: draws the avatar as SVG from the state. Girl and boy are separate branches.
+- Data constants near the top of the script: `COLORS`, `SHOES`, `HAND`, `BACK`, `BADGE`, `TRIM`, `PATTERN`, `HATS`, `HLEN`, `GLOVES`, `VEIL`, `DECKS` (quiz decks), `SURAHS` (Arabic ayat for recitation and hifz), `DZIKIR`, `DUAS`, `WUDU_STEPS`, `PILLARS`, `LETTERS` (all 28), `ZONES` (the two districts and where the avatar stands at each place).
+- `S`: saved game state (name, outfit choices, coins, stars, owned items, daily deeds, recitation counts, `gfx` graphics setting, `zone` current district). Saved under the `madinati-v1` key. Old saves are migrated near where `S` is created.
+- `avatar(s)`: draws the avatar as SVG from the state. Girl and boy are separate branches. With Detailed graphics it adds shading, folds and a ground shadow, but never a face.
+- Graphics: `GFX()` is true unless the player picked Simple on the Town tab. Every drawing function takes a `D` flag and adds extra layers (shading, windows, trees, lamps, moving clouds and water) on top of the simple shapes, so both modes share one set of art. Colours are CSS variables, so light and dark mode both work. Animations stop under `prefers-reduced-motion`.
 - Wardrobe: `renderWardrobe`, `pick`, `buy`, `tryBar`. Tapping a locked item previews it in `trial` without charging. `OWN` maps each setting to its item list and ownership prefix.
-- Town: `renderTown`, `goPlace`, `openPlace`. Each building opens a bottom sheet menu.
-- Activities: `quiz`, `letterQuiz`, `orderGame`, `market`, `dzikirCounter`, `hifzQuiz`, `reciteMenu`/`recite`, `memMenu`/`memCheck`.
+- Town: `renderTown`, `goPlace`, `openPlace`. Each building opens a bottom sheet menu. Art is in `artOld` (Old Town: Masjid, Madrasa, Library, Garden of Adab, Sadaqah Market) and `artRiver` (Riverside Quarter: My Home, Wudu Fountain, Play Park, Pillars Hall, Date Orchard). The `gate` place in each district walks the avatar to the other one, and so do the district buttons above the map.
+- Activities: `quiz`, `letterQuiz`, `orderSteps` (used by `orderGame`, `wuduGame`, `pillarsGame`), `market`, `dzikirCounter`, `hifzQuiz`, `reciteMenu`/`recite` (also practises duas), `memMenu`/`memCheck`, `duaCard`/`duaList`/`duaQuiz`, `matchGame` (letter memory pairs), `harvest` (tap the ripe dates), `mathQuiz` (sharing sums, made fresh each round).
 - Speech checking: `listen`, `grade`, `alignWords`, `errMsg`. Uses the browser's Web Speech API with `ar-SA`. Words are compared after stripping diacritics, with a 75 percent pass mark. It cannot judge tajweed. A parent or teacher checkbox path always works as a fallback.
 - Rewards: `reward(id,coins,stars)` pays once per activity per day.
+- `REVIEW.md` lists content added from general knowledge that still needs a teacher or scholar to check it. Matching `REVIEW:` comments mark it in the code.
 
 ## Known limits
 - The microphone check needs a normal https page (or localhost). Chrome refuses it for a file opened from the device (`file://` or `content://`) and inside embedded frames. It also needs an internet connection.
@@ -25,7 +27,7 @@ A single-file web game for children aged 6-12. The player walks an avatar around
 - Fonts (Fredoka, Nunito, Amiri) come from Google Fonts. Offline, the page falls back to system fonts.
 
 ## Testing
-`tests/smoke.js` clicks through the town, quizzes, dzikir counter, recitation fallback, wardrobe try-on and daily deeds in headless Chromium and reports page errors. Run it with `node tests/smoke.js $PWD/index.html` (needs Playwright).
+`tests/smoke.js` clicks through both districts, the quizzes, dzikir counter, recitation and dua fallback, the order games, letter match, date harvest, the graphics switch, wardrobe try-on and daily deeds in headless Chromium and reports page errors. Run it with `node tests/smoke.js $PWD/index.html` (needs Playwright). Set `SHOTS=<dir>` to choose where its screenshots are saved.
 
 ## Ideas not built yet
-Wudu steps, dua of the day, a parent view of what a child has learned, more surahs, a printable progress sheet, offline support (service worker) and an installable app. Also the original idea of syncing progress between devices.
+A parent view of what a child has learned, more surahs, a printable progress sheet, offline support (service worker) and an installable app. Also the original idea of syncing progress between devices.
