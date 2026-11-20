@@ -37,3 +37,4 @@ A single-file web game for children aged 6-12. The player walks an avatar around
 
 ## Ideas not built yet
 More surahs, offline support (service worker) and an installable app. Also the original idea of syncing progress between devices.
+- Make the microphone check work on Huawei and Honor devices, which have no Google speech service for Chrome to use (issue #5). The most promising route is an Arabic speech model running inside the page, perhaps only as a fallback when `S.noSR` is set. It needs a decision first, because it means a large one-time download and an outside library, which breaks the single-file design. A hosted speech service is ruled out, because children's voices must not leave the device.
