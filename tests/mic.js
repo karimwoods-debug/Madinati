@@ -50,10 +50,14 @@ const FAKE=`(()=>{
   await p.click('#mic');await p.waitForFunction(()=>document.querySelector('#res').textContent.includes('mic: ok'));
   log('service refused message',(await p.textContent('#res')).trim().slice(0,60));
   log('shows Google app step',(await p.textContent('#res')).includes('Google'));
+  log('says device cannot run the check',(await p.textContent('#res')).includes('cannot run on this device'));
+  await p.click('#sh-x');await open();
+  log('note shown next time',!!(await p.$('#nosr')));
   // 4) wrong words: graded, not passed
   await p.evaluate(()=>{__plan.length=0;__plan.push({results:[{t:'قل هو',final:true}]})});
   await p.click('#mic');await p.waitForFunction(()=>!document.querySelector('#mic.live'),null,{timeout:8000});
   log('wrong words result',(await p.textContent('#res')).trim().slice(0,30));
+  log('note removed once recognition works',!(await p.$('#nosr'))&&await p.evaluate(()=>!S.noSR));
   console.log('page errors:',errs);await b.close();srv.close();
   if(errs.length)process.exit(1);
 })().catch(e=>{console.error('FAIL',e.message);process.exit(1)});
