@@ -101,6 +101,14 @@ const {chromium}=require('playwright');
   await p.click('[data-tab="deeds"]');await p.click('[data-d="fajr"]');log('coins after deed',await p.textContent('#coins'));
   await p.screenshot({path:(process.env.SHOTS||'.')+'/shot-deeds.png'});
   await p.click('[data-tab="town"]');await p.screenshot({path:(process.env.SHOTS||'.')+'/shot-town.png'});
+  // parent view
+  await p.click('[data-tab="parents"]');await p.waitForSelector('.stats');
+  log('parent stats',await p.$$eval('.stat',a=>a.map(x=>x.textContent.replace(/\s+/g,' ').trim()).join(' | ')));
+  log('today activities',(await p.textContent('.day')).replace(/\s+/g,' ').slice(0,120));
+  log('fajr ticked today',await p.$eval('.tbl tbody tr td:nth-last-child(2)',e=>e.textContent));
+  log('quiz rows',await p.$$eval('.card:nth-of-type(5) tbody tr',a=>a.length));
+  await p.emulateMedia({media:'print'});await p.screenshot({path:(process.env.SHOTS||'.')+'/shot-parents-print.png',fullPage:true});await p.emulateMedia({media:'screen'});
+  await p.screenshot({path:(process.env.SHOTS||'.')+'/shot-parents.png',fullPage:true});
   console.log('page errors:',errs);
   await b.close();
 })().catch(e=>{console.error('FAIL',e.message);process.exit(1)});

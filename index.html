@@ -48,9 +48,9 @@ h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance}
 .chip{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);
   border-radius:999px;padding:5px 12px 5px 8px;font-weight:800;font-variant-numeric:tabular-nums}
 
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--surface);
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--surface);
   border:1px solid var(--line);padding:5px;border-radius:14px}
-.tabs button{border:0;background:transparent;padding:10px 4px;border-radius:10px;font-weight:800;color:var(--muted);min-height:44px}
+.tabs button{border:0;background:transparent;padding:10px 2px;font-size:15px;line-height:1.2;border-radius:10px;font-weight:800;color:var(--muted);min-height:44px}
 .tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
 
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -166,6 +166,28 @@ input[type=text]{font:inherit;padding:11px 12px;border:1px solid var(--line);bor
 .palm .dt:focus-visible{outline:none}
 .palm .dt:focus-visible .hitc{stroke:var(--accent);stroke-width:2.5}
 .palm .dt.fall{transition:transform .5s ease-in,opacity .5s;transform:translateY(70px);opacity:0}
+/* parent view */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--bg);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat b{font-family:var(--display);font-weight:600;font-size:22px;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:13px;line-height:1.25}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{color:var(--muted);font-weight:800;font-size:13px}
+.tbl td.c,.tbl th.c{text-align:center}
+.tbl .yes{color:var(--good);font-weight:800}
+.tbl .no{color:var(--line)}
+.day{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px solid var(--line)}
+.day:last-child{border-bottom:0}
+.day b{font-weight:800}
+.day small{color:var(--muted)}
+.scroll{overflow-x:auto}
+@media print{
+  :root{--bg:#fff;--surface:#fff;--ink:#000;--muted:#444;--line:#bbb;--good:#1B6B3B;color-scheme:light}
+  body{background:#fff;color:#000;padding:0}
+  .tabs,.foot,#toast,.chips,.noprint{display:none!important}
+  .card{break-inside:avoid;border-color:#bbb}
+}
 @media (prefers-reduced-motion:reduce){.me{transition:none}.sheet,.shake,.drift,.ripple,.zone-in{animation:none}.palm .dt.fall{transition:none}}
 </style>
 
@@ -181,6 +203,7 @@ input[type=text]{font:inherit;padding:11px 12px;border:1px solid var(--line);bor
     <button role="tab" data-tab="town" aria-selected="true">Town</button>
     <button role="tab" data-tab="wardrobe" aria-selected="false">Wardrobe</button>
     <button role="tab" data-tab="deeds" aria-selected="false">Daily deeds</button>
+    <button role="tab" data-tab="parents" aria-selected="false">Parents</button>
   </nav>
   <main id="view"></main>
   <p class="foot">No music, no chat with strangers, no ads. Questions cover the basics, so check anything new with a parent or teacher.</p>
@@ -321,12 +344,13 @@ const ZONES={
 /* ---------- state ---------- */
 const KEY='madinati-v1';
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
-let S=Object.assign({name:'',gender:'girl',skin:1,garment:'forest',head:'navy',hat:'kufi',hand:'none',back:'none',badge:'none',shoe:'black',sstyle:'shoes',trim:'none',hlen:'regular',vest:'none',pattern:'none',gloves:'none',veil:'none',rec:{},coins:10,stars:0,owned:[],done:{},deeds:{d:'',t:[]},given:0,gfx:'detailed',zone:'old'},load());
+let S=Object.assign({name:'',gender:'girl',skin:1,garment:'forest',head:'navy',hat:'kufi',hand:'none',back:'none',badge:'none',shoe:'black',sstyle:'shoes',trim:'none',hlen:'regular',vest:'none',pattern:'none',gloves:'none',veil:'none',rec:{},coins:10,stars:0,owned:[],done:{},deeds:{d:'',t:[]},given:0,gfx:'detailed',zone:'old',hist:{},best:{},mem:{},since:''},load());
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 if(S.acc){if(S.acc==='quran')S.hand='quran';if(S.acc==='bag'||S.acc==='mat')S.back=S.acc;delete S.acc}
 S.owned=S.owned.map(k=>k.replace(/^acc:quran$/,'hand:quran').replace(/^acc:(bag|mat)$/,'back:$1'));
 if(S.deeds.d!==today())S.deeds={d:today(),t:[]};
 if(!ZONES[S.zone])S.zone='old';
+if(!S.since)S.since=today();
 let tab='town', pos='start', zone=S.zone;
 const GFX=()=>S.gfx!=='simple';
 
@@ -614,7 +638,15 @@ function openPlace(b){
   if(b==='pillars')menu('Pillars Hall',[['Five pillars in order','Tap them from the first to the fifth',pillarsGame],['Pillars questions','5 quick questions',()=>quiz('pillars')]]);
   if(b==='orchard')menu('Date Orchard',[['Date harvest','Pick only the ripe dates',harvest],['Share the dates','Counting, sharing and adding up',mathQuiz]]);
 }
+/* history for the parent view: what was finished on each day, kept for 60 days */
+function dayLog(){const d=today();return S.hist[d]=S.hist[d]||{a:{},d:[]}}
+function track(id){
+  const h=dayLog();h.a[id]=(h.a[id]||0)+1;
+  const ks=Object.keys(S.hist);if(ks.length>60)ks.sort((a,b)=>new Date(a)-new Date(b)).slice(0,ks.length-60).forEach(k=>delete S.hist[k]);
+  save();
+}
 function reward(id,coins,stars){
+  track(id);
   if(S.done[id]===today())return 'Practice round. You already collected today’s reward here.';
   S.done[id]=today();S.coins+=coins;S.stars+=stars;save();renderTop();
   return `+${coins} coins, +${stars} stars`;
@@ -638,7 +670,9 @@ function quiz(id,custom){
     });
   };
   const finish=()=>{
-    const msg=reward('q:'+(custom?custom.id:id),score*3,score);
+    const qk=custom?custom.id:id, bq=S.best[qk]||{s:0,n:list.length,t:0};
+    S.best[qk]={s:Math.max(bq.s,score),n:list.length,t:bq.t+1,last:score};
+    const msg=reward('q:'+qk,score*3,score);
     body(`<p class="big">${score} / ${list.length}</p>
       <p class="q" style="text-align:center">${score===list.length?'Masha’Allah! Perfect.':score>=list.length/2?'Well done. Keep learning.':'Good effort. Try again to learn more.'}</p>
       <p class="fb" style="text-align:center">${msg}</p>
@@ -896,7 +930,7 @@ function memCheck(sid){
     $('#ok').onclick=()=>{i++;i<sr.a.length?show():done()};
   };
   const done=()=>{
-    const msg=reward('mem:'+sid,10,5);
+    S.mem[sid]=(S.mem[sid]||0)+1;const msg=reward('mem:'+sid,10,5);
     body(`<p class="big">Masha’Allah!</p><p class="q" style="text-align:center">You said all of ${esc(sr.n)} from memory.</p><p class="fb" style="text-align:center">${msg}</p>
       <div class="row"><button class="btn" id="again">Again</button><button class="btn alt" id="home">Back to town</button></div>`);
     $('#again').onclick=()=>memCheck(sid);$('#home').onclick=closeSheet;
@@ -968,7 +1002,7 @@ function market(){
       <p class="note">You have ${S.coins} coins. You earn a star every time you give.</p>`);
     b.querySelectorAll('[data-g]').forEach(btn=>btn.onclick=()=>{
       const n=+btn.dataset.g; if(S.coins<n)return;
-      const before=Math.floor(S.given/50); S.coins-=n;S.given+=n;S.stars+=1;save();renderTop();
+      const before=Math.floor(S.given/50); S.coins-=n;S.given+=n;S.stars+=1;track('give');renderTop();
       if(Math.floor(S.given/50)>before)toast('A new well was built. Jazakallahu khayran!');
       draw();
     });
@@ -1049,14 +1083,76 @@ function renderDeeds(){
 function toggleDeed(id){
   const t=S.deeds.t,i=t.indexOf(id);
   if(i<0){t.push(id);S.coins+=3}else{t.splice(i,1);S.coins=Math.max(0,S.coins-3)}
-  save();renderTop();renderDeeds();
+  dayLog().d=t.slice();save();renderTop();renderDeeds();
+}
+
+/* ---------- parent view (read only) ---------- */
+const ACT_N={order:'Order the prayer',wudu:'Steps of wudu',pillars:'Five pillars in order',dzikir:'Dzikir counter',match:'Letter match',harvest:'Date harvest',give:'Gave sadaqah'};
+const QUIZ_N={letters:'Arabic letters',duas:'Which dua?',math:'Share the dates'};
+const surahN=id=>(SURAHS.find(x=>x.id===id)||{n:id}).n, duaN=id=>(DUAS.find(x=>x.id===id)||{n:id}).n;
+function quizName(k){
+  if(DECKS[k])return DECKS[k].title;
+  if(k.startsWith('hifz:')){const ids=k.slice(5).split(',');return 'Hifz quiz: '+(ids.length===SURAHS.length?'Mixed review':ids.map(surahN).join(', '))}
+  return QUIZ_N[k]||k;
+}
+function actName(id){
+  const i=id.indexOf(':'),k=i<0?id:id.slice(0,i),v=id.slice(i+1);
+  if(k==='q')return quizName(v);
+  if(k==='rec')return 'Recited '+surahN(v);
+  if(k==='mem')return 'From memory: '+surahN(v);
+  if(k==='dua')return 'Practised dua: '+duaN(v);
+  return ACT_N[id]||id;
+}
+const dayKey=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+function lastDays(n){const out=[];for(let i=n-1;i>=0;i--){const d=new Date();d.setHours(12);d.setDate(d.getDate()-i);out.push({k:dayKey(d),d})}return out}
+const busy=h=>!!h&&(Object.keys(h.a||{}).length>0||(h.d||[]).length>0);
+function streak(){
+  let n=0;const d=new Date();d.setHours(12);
+  if(!busy(S.hist[dayKey(d)]))d.setDate(d.getDate()-1);
+  while(busy(S.hist[dayKey(d)])){n++;d.setDate(d.getDate()-1)}
+  return n;
+}
+function renderParents(){
+  const week=lastDays(7), lvl=Math.min(Math.floor(S.stars/10),LEVELS.length-1);
+  const active=week.filter(w=>busy(S.hist[w.k])).length;
+  const fmt=d=>d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'});
+  const [sy,sm,sd]=S.since.split('-').map(Number), since=new Date(sy,sm-1,sd);
+  const stat=(v,l)=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`;
+  const days=week.slice().reverse().map(w=>{
+    const h=S.hist[w.k]||{a:{},d:[]}, acts=Object.keys(h.a), deeds=(h.d||[]).length;
+    return `<div class="day"><b>${esc(fmt(w.d))}${w.k===today()?' (today)':''}</b>
+      <small>${acts.length||deeds?`${acts.length} ${acts.length===1?'activity':'activities'}, ${deeds} good ${deeds===1?'deed':'deeds'} ticked`:'Nothing recorded'}</small>
+      ${acts.length?`<small>${acts.map(a=>esc(actName(a))+(h.a[a]>1?' ×'+h.a[a]:'')).join(', ')}</small>`:''}</div>`}).join('');
+  const PR=DEEDS[0][1];
+  const prayers=`<div class="scroll"><table class="tbl"><thead><tr><th scope="col">Prayer</th>${week.map(w=>`<th scope="col" class="c">${esc(w.d.toLocaleDateString(undefined,{weekday:'narrow'}))}</th>`).join('')}<th scope="col" class="c">Days</th></tr></thead><tbody>
+    ${PR.map(([id,t])=>{const on=week.map(w=>((S.hist[w.k]||{}).d||[]).includes(id));
+      return `<tr><th scope="row">${esc(t.replace('Prayed ',''))}</th>${on.map(o=>`<td class="c ${o?'yes':'no'}">${o?'✓':'·'}</td>`).join('')}<td class="c">${on.filter(Boolean).length}/7</td></tr>`}).join('')}</tbody></table></div>`;
+  const quran=`<div class="scroll"><table class="tbl"><thead><tr><th scope="col">Surah</th><th scope="col" class="c">Recited</th><th scope="col" class="c">From memory</th><th scope="col" class="c">Hifz quiz best</th></tr></thead><tbody>
+    ${SURAHS.map(x=>{const b=S.best['hifz:'+x.id];return `<tr><th scope="row">${esc(x.n)}</th><td class="c">${(S.rec||{})[x.id]||0}</td><td class="c">${S.mem[x.id]||0}</td><td class="c">${b?b.s+' / '+b.n:'–'}</td></tr>`}).join('')}</tbody></table></div>`;
+  const qs=Object.keys(S.best).filter(k=>!/^hifz:[^,]+$/.test(k)).sort((a,b)=>quizName(a).localeCompare(quizName(b)));
+  const quizzes=qs.length?`<div class="scroll"><table class="tbl"><thead><tr><th scope="col">Quiz</th><th scope="col" class="c">Best</th><th scope="col" class="c">Last</th><th scope="col" class="c">Played</th></tr></thead><tbody>
+    ${qs.map(k=>{const b=S.best[k];return `<tr><th scope="row">${esc(quizName(k))}</th><td class="c">${b.s} / ${b.n}</td><td class="c">${b.last??'–'} / ${b.n}</td><td class="c">${b.t}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="hint">No quizzes finished yet.</p>';
+  const duas=`<div class="scroll"><table class="tbl"><thead><tr><th scope="col">Dua</th><th scope="col" class="c">Practised</th></tr></thead><tbody>
+    ${DUAS.map(d=>`<tr><th scope="row">${esc(d.n)}</th><td class="c">${(S.rec||{})[d.id]||0}</td></tr>`).join('')}</tbody></table></div>`;
+  $('#view').innerHTML=`
+  <section class="card"><h3>${S.name.trim()?esc(S.name.trim())+'’s progress':'Progress'}</h3>
+    <p class="hint">This page is for parents and teachers. Everything here stays on this device. Daily history started on ${esc(fmt(since))}.</p>
+    <div class="stats">${stat(lvl+1,'Level: '+LEVELS[lvl])}${stat(S.stars,'Stars of knowledge')}${stat(S.coins,'Coins to spend')}
+      ${stat(active+' / 7','Days active this week')}${stat(streak(),'Day streak')}${stat(S.given,'Coins given ('+Math.floor(S.given/50)+' wells)')}</div>
+    <button class="btn alt noprint" id="print">Print a progress sheet</button></section>
+  <section class="card"><h3>The last 7 days</h3><div>${days}</div></section>
+  <section class="card"><h3>Prayers ticked in Daily deeds</h3>${prayers}<p class="hint">Children tick these themselves, so treat them as a conversation starter.</p></section>
+  <section class="card"><h3>Qur’an</h3>${quran}<p class="hint">The microphone check compares words only. It cannot judge tajweed.</p></section>
+  <section class="card"><h3>Quiz scores</h3>${quizzes}</section>
+  <section class="card"><h3>Duas</h3>${duas}</section>`;
+  $('#print').onclick=()=>window.print();
 }
 
 /* ---------- wiring ---------- */
 function render(){
   if(tab!=='wardrobe')trial={};
   $$('.tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===tab)));
-  ({town:renderTown,wardrobe:renderWardrobe,deeds:renderDeeds})[tab]();
+  ({town:renderTown,wardrobe:renderWardrobe,deeds:renderDeeds,parents:renderParents})[tab]();
 }
 document.addEventListener('click',e=>{
   const t=e.target.closest('.tabs button');if(t){tab=t.dataset.tab;render();return}
