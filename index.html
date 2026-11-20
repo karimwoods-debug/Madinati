@@ -12,15 +12,21 @@
   --display:'Fredoka','Trebuchet MS',system-ui,sans-serif;
   --body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
   --arabic:'Amiri','Traditional Arabic','Noto Naskh Arabic',serif;
+  --water:#7EC3D8; --sun:#F7D774; --cloud:#FFFFFF; --leaf:#3E9A5B; --leaf-dk:#2D7444; --wood:#7A5430;
+  --wall-dk:color-mix(in srgb,var(--wall) 78%,#6B5530); --accent-dk:color-mix(in srgb,var(--accent) 70%,#000);
+  --gold-dk:color-mix(in srgb,var(--gold) 72%,#000); --ground-dk:color-mix(in srgb,var(--ground) 82%,#1D3B1D);
+  --path-dk:color-mix(in srgb,var(--path) 80%,#5B4520);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0A1715; --surface:#13282A; --ink:#E3F0ED; --muted:#8FAAA5; --line:#264340;
   --accent:#3FBFA6; --accent-ink:#04211B; --gold:#E0B24A; --good:#4CC384; --bad:#E57B72;
-  --sky1:#12303A; --sky2:#1B3D3E; --ground:#1D4232; --path:#5B5438; --wall:#D9D1BD; color-scheme:dark}}
+  --sky1:#12303A; --sky2:#1B3D3E; --ground:#1D4232; --path:#5B5438; --wall:#D9D1BD; color-scheme:dark; --water:#24586A; --sun:#E9E5CF; --cloud:#2A4B50; --leaf:#2F7A4A; --leaf-dk:#225C37}
+  :root:not([data-theme="light"]) .nite{display:inline}}
 :root[data-theme="dark"]{
   --bg:#0A1715; --surface:#13282A; --ink:#E3F0ED; --muted:#8FAAA5; --line:#264340;
   --accent:#3FBFA6; --accent-ink:#04211B; --gold:#E0B24A; --good:#4CC384; --bad:#E57B72;
-  --sky1:#12303A; --sky2:#1B3D3E; --ground:#1D4232; --path:#5B5438; --wall:#D9D1BD; color-scheme:dark}
+  --sky1:#12303A; --sky2:#1B3D3E; --ground:#1D4232; --path:#5B5438; --wall:#D9D1BD; color-scheme:dark; --water:#24586A; --sun:#E9E5CF; --cloud:#2A4B50; --leaf:#2F7A4A; --leaf-dk:#225C37}
+:root[data-theme="dark"] .nite{display:inline}
 
 [hidden]{display:none!important}
 *{box-sizing:border-box}
@@ -42,9 +48,9 @@ h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance}
 .chip{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);
   border-radius:999px;padding:5px 12px 5px 8px;font-weight:800;font-variant-numeric:tabular-nums}
 
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--surface);
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--surface);
   border:1px solid var(--line);padding:5px;border-radius:14px}
-.tabs button{border:0;background:transparent;padding:10px 4px;border-radius:10px;font-weight:800;color:var(--muted);min-height:44px}
+.tabs button{border:0;background:transparent;padding:10px 2px;font-size:15px;line-height:1.2;border-radius:10px;font-weight:800;color:var(--muted);min-height:44px}
 .tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
 
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -136,11 +142,55 @@ input[type=text]{font:inherit;padding:11px 12px;border:1px solid var(--line);bor
 .tap{position:absolute;inset:24px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);font:600 44px var(--display);font-variant-numeric:tabular-nums}
 .tap:active{transform:scale(.97)}
 .seg.wt button{padding:8px 13px}
+.ra{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;min-height:44px;padding:8px 14px}
+.btn.live{background:var(--bad);color:#fff;border-color:var(--bad)}
 .tryrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg);border:2px solid var(--gold);border-radius:12px;padding:10px 12px}
 .tryrow .btn{min-height:44px;padding:8px 16px}
 .w.ok{color:var(--good)}
 .w.bad{color:var(--bad);text-decoration:underline wavy}
-@media (prefers-reduced-motion:reduce){.me{transition:none}.sheet,.shake{animation:none}}
+/* detailed graphics and the Riverside Quarter */
+.nite{display:none}
+.drift{animation:drift 70s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translateX(36px)}}
+.ripple{animation:rip 2.6s ease-in-out infinite}
+@keyframes rip{50%{opacity:.3}}
+.zone-in{animation:fadein .45s ease-out}
+@keyframes fadein{from{opacity:0}}
+.zonebar button{flex:1}
+.translit{font-style:italic;text-align:center;margin:0;color:var(--muted)}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mc{min-height:78px;border-radius:12px;border:2px solid var(--line);background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:17px;display:grid;place-items:center;padding:4px}
+.mc.up{background:var(--bg);color:var(--ink)}
+.mc.ar{font-family:var(--arabic);font-size:38px;line-height:1}
+.mc.done{border-color:var(--good);background:color-mix(in srgb,var(--good) 16%,var(--bg));color:var(--ink);cursor:default}
+.palm{display:block;width:100%;max-width:340px;margin:0 auto;height:auto;background:linear-gradient(var(--sky1),var(--sky2));border-radius:14px}
+.palm .dt{cursor:pointer}
+.palm .dt:focus-visible{outline:none}
+.palm .dt:focus-visible .hitc{stroke:var(--accent);stroke-width:2.5}
+.palm .dt.fall{transition:transform .5s ease-in,opacity .5s;transform:translateY(70px);opacity:0}
+/* parent view */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--bg);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat b{font-family:var(--display);font-weight:600;font-size:22px;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:13px;line-height:1.25}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{color:var(--muted);font-weight:800;font-size:13px}
+.tbl td.c,.tbl th.c{text-align:center}
+.tbl .yes{color:var(--good);font-weight:800}
+.tbl .no{color:var(--line)}
+.day{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px solid var(--line)}
+.day:last-child{border-bottom:0}
+.day b{font-weight:800}
+.day small{color:var(--muted)}
+.scroll{overflow-x:auto}
+@media print{
+  :root{--bg:#fff;--surface:#fff;--ink:#000;--muted:#444;--line:#bbb;--good:#1B6B3B;color-scheme:light}
+  body{background:#fff;color:#000;padding:0}
+  .tabs,.foot,#toast,.chips,.noprint{display:none!important}
+  .card{break-inside:avoid;border-color:#bbb}
+}
+@media (prefers-reduced-motion:reduce){.me{transition:none}.sheet,.shake,.drift,.ripple,.zone-in{animation:none}.palm .dt.fall{transition:none}}
 </style>
 
 <div class="wrap">
@@ -155,6 +205,7 @@ input[type=text]{font:inherit;padding:11px 12px;border:1px solid var(--line);bor
     <button role="tab" data-tab="town" aria-selected="true">Town</button>
     <button role="tab" data-tab="wardrobe" aria-selected="false">Wardrobe</button>
     <button role="tab" data-tab="deeds" aria-selected="false">Daily deeds</button>
+    <button role="tab" data-tab="parents" aria-selected="false">Parents</button>
   </nav>
   <main id="view"></main>
   <p class="foot">No music, no chat with strangers, no ads. Questions cover the basics, so check anything new with a parent or teacher.</p>
@@ -237,25 +288,74 @@ const DECKS={
     {q:'What do you say after you sneeze?',o:['Alhamdulillah','Bismillah','Allahu Akbar'],a:'Alhamdulillah',e:'It means “All praise is for Allah”.'},
     {q:'Your friend sneezes and says Alhamdulillah. You say...',o:['Yarhamukallah','Astaghfirullah','Ameen'],a:'Yarhamukallah',e:'It means “May Allah have mercy on you”.'},
     {q:'Which hand do we use for eating?',o:['Right hand','Left hand','Either, it does not matter'],a:'Right hand',e:'The Prophet ﷺ taught us to eat with the right hand.'},
-    {q:'Allah commands us to be kind to...',o:['Our parents','Only our friends','Nobody'],a:'Our parents',e:'Being kind and respectful to parents is a big part of Islam.'}]}
+    {q:'Allah commands us to be kind to...',o:['Our parents','Only our friends','Nobody'],a:'Our parents',e:'Being kind and respectful to parents is a big part of Islam.'}]},
+  /* REVIEW: the wudu, pillars and kind decks below were added from general knowledge and need a teacher or scholar to check them. See REVIEW.md. */
+  wudu:{title:'Wudu questions',items:[
+    {q:'What do we say when we begin wudu?',o:['Bismillah','Ameen','Alhamdulillah'],a:'Bismillah',e:'Bismillah means “In the name of Allah”.'},
+    {q:'When we wash our arms, which side comes first?',o:['The right','The left','It does not matter'],a:'The right',e:'We start with the right arm, then the left. The feet are the same.'},
+    {q:'How far up do we wash our arms?',o:['To the elbows','To the wrists','To the shoulders'],a:'To the elbows',e:'Wash from the fingertips up to and including the elbows.'},
+    {q:'Which part do we wipe with wet hands instead of washing?',o:['The head','The face','The feet'],a:'The head',e:'We wipe over the head with wet hands, then wipe the ears.'},
+    {q:'What is the last step of wudu?',o:['Washing the feet','Washing the face','Rinsing the mouth'],a:'Washing the feet',e:'We wash the feet up to the ankles, right foot first.'},
+    {q:'How many times did the Prophet ﷺ often wash each part?',o:['3','10','12'],a:'3',e:'Washing once is enough. Three times is the Sunnah for most parts.'},
+    {q:'Why do we make wudu?',o:['To be clean and ready for salah','To cool down on a hot day','To play a game'],a:'To be clean and ready for salah',e:'We need wudu before we pray salah.'}]},
+  pillars:{title:'Pillars questions',items:[
+    {q:'How many pillars of Islam are there?',o:['3','5','7'],a:'5',e:'Shahada, Salah, Zakah, Sawm and Hajj.'},
+    {q:'Which pillar is the declaration of faith?',o:['Shahada','Hajj','Sawm'],a:'Shahada',e:'The Shahada says there is no god but Allah and Muhammad ﷺ is His messenger.'},
+    {q:'In which month do Muslims fast every day?',o:['Ramadan','Shawwal','Muharram'],a:'Ramadan',e:'Sawm in Ramadan lasts from dawn until sunset.'},
+    {q:'Hajj is a journey to which city?',o:['Makkah','Cairo','Istanbul'],a:'Makkah',e:'Hajj is once in a lifetime for every Muslim who is able to go.'},
+    {q:'Which pillar means giving a set part of your savings to people in need?',o:['Zakah','Salah','Shahada'],a:'Zakah',e:'Zakah keeps wealth pure and helps the poor.'},
+    {q:'Which pillar do we do five times every day?',o:['Salah','Hajj','Zakah'],a:'Salah',e:'Fajr, Dhuhr, Asr, Maghrib and Isha.'}]},
+  kind:{title:'Kind or not?',items:[
+    {q:'Sharing your toys with your little sister.',o:['Kind','Not kind'],a:'Kind',e:'Sharing makes others happy, and Allah loves those who do good.'},
+    {q:'Laughing at someone who tripped over.',o:['Kind','Not kind'],a:'Not kind',e:'Help them up and ask if they are okay instead.'},
+    {q:'Saying salam to your neighbour.',o:['Kind','Not kind'],a:'Kind',e:'Spreading salam spreads love between people.'},
+    {q:'Dropping litter in the park.',o:['Kind','Not kind'],a:'Not kind',e:'Keeping places clean is part of being a good Muslim.'},
+    {q:'Helping to lay the table for dinner.',o:['Kind','Not kind'],a:'Kind',e:'Helping your family is a good deed.'},
+    {q:'Telling a lie to get out of trouble.',o:['Kind','Not kind'],a:'Not kind',e:'Telling the truth is always better, even when it is hard.'},
+    {q:'Giving water to a thirsty cat.',o:['Kind','Not kind'],a:'Kind',e:'Kindness to animals is rewarded too.'},
+    {q:'Leaving the tap running while you make wudu.',o:['Kind','Not kind'],a:'Not kind',e:'We should not waste water, even when making wudu.'},
+    {q:'Visiting a friend who is ill.',o:['Kind','Not kind'],a:'Kind',e:'Visiting the sick is a beautiful Sunnah.'},
+    {q:'Calling someone a mean name.',o:['Kind','Not kind'],a:'Not kind',e:'We speak good words or stay quiet.'}]}
 };
-const LETTERS=[['ا','Alif'],['ب','Ba'],['ت','Ta'],['ث','Tha'],['ج','Jeem'],['ح','Haa'],['خ','Khaa'],['د','Dal']];
+/* REVIEW: Arabic text, transliteration, meanings and sources of every dua need checking by a teacher or scholar. See REVIEW.md. */
+const DUAS=[
+  {id:'dua-eat',n:'Before eating',when:'before we eat',ar:'بِسْمِ ٱللَّهِ',t:'Bismillah',m:'In the name of Allah.'},
+  {id:'dua-ate',n:'After eating',when:'after we finish eating',ar:'ٱلْحَمْدُ لِلَّهِ ٱلَّذِى أَطْعَمَنِى هَٰذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّى وَلَا قُوَّةٍ',t:'Alhamdu lillahil-ladhi at‘amani hadha wa razaqanihi min ghayri hawlin minni wa la quwwah',m:'All praise is for Allah who fed me this and gave it to me without any power or strength from me.'},
+  {id:'dua-sleep',n:'Before sleeping',when:'before we go to sleep',ar:'بِٱسْمِكَ ٱللَّهُمَّ أَمُوتُ وَأَحْيَا',t:'Bismika Allahumma amutu wa ahya',m:'In Your name, O Allah, I die and I live.'},
+  {id:'dua-wake',n:'Waking up',when:'when we wake up',ar:'ٱلْحَمْدُ لِلَّهِ ٱلَّذِى أَحْيَانَا بَعْدَ مَآ أَمَاتَنَا وَإِلَيْهِ ٱلنُّشُورُ',t:'Alhamdu lillahil-ladhi ahyana ba‘da ma amatana wa ilayhin-nushur',m:'All praise is for Allah who gave us life after taking it from us, and to Him we will return.'},
+  {id:'dua-out',n:'Leaving home',when:'when we leave the house',ar:'بِسْمِ ٱللَّهِ تَوَكَّلْتُ عَلَى ٱللَّهِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِٱللَّهِ',t:'Bismillah, tawakkaltu ‘alallah, wa la hawla wa la quwwata illa billah',m:'In the name of Allah, I trust in Allah, and there is no power and no strength except with Allah.'},
+  {id:'dua-toilet',n:'Leaving the toilet',when:'when we come out of the toilet',ar:'غُفْرَانَكَ',t:'Ghufranak',m:'I ask You for forgiveness.'},
+  {id:'dua-parents',n:'For our parents',when:'for our parents',ar:'رَّبِّ ٱرْحَمْهُمَا كَمَا رَبَّيَانِى صَغِيرًا',t:'Rabbir-hamhuma kama rabbayani saghira',m:'My Lord, have mercy on them as they raised me when I was small.',src:'Qur’an 17:24'},
+  {id:'dua-ilm',n:'For knowledge',when:'when we want to learn more',ar:'رَّبِّ زِدْنِى عِلْمًا',t:'Rabbi zidni ‘ilma',m:'My Lord, increase me in knowledge.',src:'Qur’an 20:114'},
+  {id:'dua-good',n:'For good in both worlds',when:'to ask for good in this life and the next',ar:'رَبَّنَآ ءَاتِنَا فِى ٱلدُّنْيَا حَسَنَةً وَفِى ٱلْءَاخِرَةِ حَسَنَةً وَقِنَا عَذَابَ ٱلنَّارِ',t:'Rabbana atina fid-dunya hasanah, wa fil-akhirati hasanah, wa qina ‘adhaban-nar',m:'Our Lord, give us good in this world and good in the Hereafter, and protect us from the punishment of the Fire.',src:'Qur’an 2:201'}];
+/* REVIEW: order and wording of the wudu steps and the five pillars. */
+const WUDU_STEPS=['Make the intention and say Bismillah','Wash both hands to the wrists, 3 times','Rinse the mouth, 3 times','Rinse the nose, 3 times','Wash the whole face, 3 times','Wash the arms to the elbows, right first, 3 times','Wipe over the head once','Wipe the ears once','Wash the feet to the ankles, right first, 3 times'];
+const PILLARS=['Shahada: there is no god but Allah, and Muhammad ﷺ is His messenger','Salah: praying five times a day','Zakah: giving part of your savings to people in need','Sawm: fasting in the month of Ramadan','Hajj: the journey to Makkah for those who are able'];
+/* REVIEW: letter names (transliteration varies between teachers). */
+const LETTERS=[['ا','Alif'],['ب','Ba'],['ت','Ta'],['ث','Tha'],['ج','Jeem'],['ح','Haa'],['خ','Khaa'],['د','Dal'],['ذ','Dhal'],['ر','Ra'],['ز','Zay'],['س','Seen'],['ش','Sheen'],['ص','Saad'],['ض','Daad'],['ط','Taa'],['ظ','Dhaa'],['ع','Ayn'],['غ','Ghayn'],['ف','Fa'],['ق','Qaf'],['ك','Kaf'],['ل','Lam'],['م','Meem'],['ن','Noon'],['ه','Ha'],['و','Waw'],['ي','Ya']];
 const PRAYER_STEPS=['Say “Allahu Akbar” and stand','Recite Al-Fatihah','Bow (Ruku)','Stand up from the bow','Place the forehead down (Sujud)','Sit, then make Sujud again'];
 const DEEDS=[
   ['Prayers',[['fajr','Prayed Fajr'],['dhuhr','Prayed Dhuhr'],['asr','Prayed Asr'],['maghrib','Prayed Maghrib'],['isha','Prayed Isha']]],
-  ['Remembrance',[['morning','Morning adhkar'],['evening','Evening adhkar'],['quran','Read a little Qur’an']]],
+  ['Remembrance',[['morning','Morning adhkar'],['evening','Evening adhkar'],['quran','Read a little Qur’an'],['dua','Said a dua I learned']]],
   ['Good character',[['parents','Helped my parents'],['smile','Smiled at someone (a smile is sadaqah)'],['salam','Said salam first']]]];
-const SPOTS={start:[180,306],masjid:[180,226],madrasa:[72,312],library:[288,312],garden:[72,438],market:[288,438]};
+/* Two districts. Each spot is where the avatar stands; 'gate' walks to the other district. */
+const ZONES={
+  old:{n:'Old Town',other:'river',spots:{start:[180,306],gate:[180,438],masjid:[180,226],madrasa:[72,312],library:[288,312],garden:[72,438],market:[288,438]}},
+  river:{n:'Riverside Quarter',other:'old',spots:{start:[180,206],gate:[180,206],home:[72,262],wudu:[288,262],park:[72,438],pillars:[180,438],orchard:[288,438]}}};
 
 /* ---------- state ---------- */
 const KEY='madinati-v1';
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
-let S=Object.assign({name:'',gender:'girl',skin:1,garment:'forest',head:'navy',hat:'kufi',hand:'none',back:'none',badge:'none',shoe:'black',sstyle:'shoes',trim:'none',hlen:'regular',vest:'none',pattern:'none',gloves:'none',veil:'none',rec:{},coins:10,stars:0,owned:[],done:{},deeds:{d:'',t:[]},given:0},load());
+let S=Object.assign({name:'',gender:'girl',skin:1,garment:'forest',head:'navy',hat:'kufi',hand:'none',back:'none',badge:'none',shoe:'black',sstyle:'shoes',trim:'none',hlen:'regular',vest:'none',pattern:'none',gloves:'none',veil:'none',rec:{},coins:10,stars:0,owned:[],done:{},deeds:{d:'',t:[]},given:0,gfx:'detailed',zone:'old',hist:{},best:{},mem:{},since:'',sound:'off'},load());
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 if(S.acc){if(S.acc==='quran')S.hand='quran';if(S.acc==='bag'||S.acc==='mat')S.back=S.acc;delete S.acc}
 S.owned=S.owned.map(k=>k.replace(/^acc:quran$/,'hand:quran').replace(/^acc:(bag|mat)$/,'back:$1'));
 if(S.deeds.d!==today())S.deeds={d:today(),t:[]};
-let tab='town', pos='start';
+if(!ZONES[S.zone])S.zone='old';
+if(!S.since)S.since=today();
+if(!['off','fx','all'].includes(S.sound))S.sound='off';
+let tab='town', pos='start', zone=S.zone;
+const GFX=()=>S.gfx!=='simple';
 
 /* ---------- avatar (faceless on purpose, modest clothing only) ---------- */
 let PID=0;
@@ -268,9 +368,11 @@ function avatar(s){
   const girl=s.gender==='girl';
   const vest=!girl&&s.vest&&s.vest!=='none'?col(s.vest):null;
   const gl=girl?({black:'#2B2B2B',match:g,white:'#F1F1EC'})[s.gloves]:null, hc=gl||sk;
-  const pat=PATS[s.pattern], pid='pt'+(++PID);
-  const defs=pat?`<defs><pattern id="${pid}" patternUnits="userSpaceOnUse" width="${pat[0]}" height="${pat[1]}">${pat[2]}</pattern></defs>`:'';
-  const ov=d=>pat?`<path d="${d}" fill="url(#${pid})"/>`:'';
+  const pat=PATS[s.pattern], pid='pt'+(++PID), D=GFX(), sid='sg'+PID;
+  const defs=(pat||D)?`<defs>${pat?`<pattern id="${pid}" patternUnits="userSpaceOnUse" width="${pat[0]}" height="${pat[1]}">${pat[2]}</pattern>`:''}${D?`<linearGradient id="${sid}" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></linearGradient>`:''}</defs>`:'';
+  const ov=d=>(pat?`<path d="${d}" fill="url(#${pid})"/>`:'')+(D?`<path d="${d}" fill="url(#${sid})"/>`:'');
+  const gshadow=D?'<ellipse cx="50" cy="154" rx="33" ry="4.5" fill="rgba(0,0,0,.16)"/>':'';
+  const shoeHi=D?'<ellipse cx="34" cy="149" rx="3.5" ry="1.2" fill="rgba(255,255,255,.3)"/><ellipse cx="58" cy="149" rx="3.5" ry="1.2" fill="rgba(255,255,255,.3)"/>':'';
   const A1='M31 60 L15 112 L26 115 L39 67Z', A2='M69 60 L85 112 L74 115 L61 67Z';
   let back='',front='';
   if(s.back==='bag')back='<rect x="58" y="66" width="28" height="38" rx="8" fill="#B5762B"/><rect x="62" y="80" width="20" height="10" rx="3" fill="#8F5A1F"/>';
@@ -299,19 +401,21 @@ function avatar(s){
   else if(st==='sneakers')shoes=`<ellipse cx="38" cy="152.5" rx="11" ry="3" fill="#F1F1EC"/><ellipse cx="62" cy="152.5" rx="11" ry="3" fill="#F1F1EC"/><ellipse cx="38" cy="150" rx="10" ry="4.5" fill="${sh}"/><ellipse cx="62" cy="150" rx="10" ry="4.5" fill="${sh}"/>`;
   else shoes=`<ellipse cx="38" cy="151" rx="10" ry="4.5" fill="${sh}"/><ellipse cx="62" cy="151" rx="10" ry="4.5" fill="${sh}"/>`;
   const arms=`<path d="${A1}" fill="${g}"/><path d="${A2}" fill="${g}"/>${ov(A1)}${ov(A2)}`;
-  const hands=`<circle cx="20.5" cy="117" r="5.5" fill="${hc}"/><circle cx="79.5" cy="117" r="5.5" fill="${hc}"/>`;
+  const hands=`<circle cx="20.5" cy="117" r="5.5" fill="${hc}"/><circle cx="79.5" cy="117" r="5.5" fill="${hc}"/>`+(D?'<circle cx="18.6" cy="115.2" r="1.8" fill="rgba(255,255,255,.3)"/><circle cx="77.6" cy="115.2" r="1.8" fill="rgba(255,255,255,.3)"/>':'');
   const cuffs=tc?`<path d="M17 106 L30 109.5 M83 106 L70 109.5" stroke="${tc}" stroke-width="3.5"/>`:'';
   if(girl){
     const REG='M50 12 C31 12 24 30 26 46 C19 58 17 80 21 98 Q50 106 79 98 C83 80 81 58 74 46 C76 30 69 12 50 12Z';
     const LONG='M50 12 C31 12 24 30 26 46 C19 62 16 100 20 128 Q50 138 80 128 C84 100 81 62 74 46 C76 30 69 12 50 12Z';
-    const kh=s.hlen==='layered'?`<path d="${LONG}" fill="${tint(h,.5)}"/><path d="${REG}" fill="${h}"/>`:`<path d="${s.hlen==='long'?LONG:REG}" fill="${h}"/>`;
+    const khs=D?`<path d="${s.hlen==='regular'?REG:LONG}" fill="url(#${sid})"/>`:'';
+    const kh=(s.hlen==='layered'?`<path d="${LONG}" fill="${tint(h,.5)}"/><path d="${REG}" fill="${h}"/>`:`<path d="${s.hlen==='long'?LONG:REG}" fill="${h}"/>`)+khs;
+    const folds=D?'<path d="M45 100 Q43 124 41 149 M55 100 Q57 124 59 149" stroke="rgba(0,0,0,.08)" stroke-width="1.2" fill="none"/>':'';
     const BODY='M31 56 Q50 48 69 56 L83 148 Q50 157 17 148Z';
     let hem='';
     if(tc)hem=`<path d="M18 141 Q50 150 82 141" stroke="${tc}" stroke-width="3" fill="none"/>`+(s.trim==='dots'?[[27,136.5],[38.5,139],[50,139.8],[61.5,139],[73,136.5]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="1.8" fill="${tc}"/>`).join(''):'');
     else hem='<path d="M19 142 Q50 151 81 142" stroke="rgba(255,255,255,.3)" stroke-width="2" fill="none"/>';
     const veil=s.veil==='niqab'?`<ellipse cx="50" cy="38" rx="11.5" ry="14" fill="${h}"/><rect x="38.5" y="31" width="23" height="7" rx="3.5" fill="${sk}"/>`:'';
-    return `<g>${defs}${back}${shoes}<path d="${BODY}" fill="${g}"/>${ov(BODY)}
-    <path d="M37 92 L30 146 M63 92 L70 146" stroke="rgba(0,0,0,.1)" stroke-width="1.5"/>${hem}${arms}${cuffs}${kh}
+    return `<g>${defs}${gshadow}${back}${shoes}${shoeHi}<path d="${BODY}" fill="${g}"/>${ov(BODY)}
+    <path d="M37 92 L30 146 M63 92 L70 146" stroke="rgba(0,0,0,.1)" stroke-width="1.5"/>${folds}${hem}${arms}${cuffs}${kh}
     <path d="M31 52 C27 70 27 86 30 96" stroke="rgba(255,255,255,.22)" stroke-width="2" fill="none"/><path d="M69 52 C73 70 73 86 70 96" stroke="rgba(0,0,0,.12)" stroke-width="2" fill="none"/>
     <ellipse cx="50" cy="38" rx="11.5" ry="14" fill="${sk}" stroke="rgba(0,0,0,.14)"/>${veil}${hands}${front}</g>`;
   }
@@ -326,64 +430,216 @@ function avatar(s){
   const hemB=tc?`<path d="M24 137 H76" stroke="${tc}" stroke-width="3"/>`:'<path d="M24 141 H76" stroke="rgba(255,255,255,.35)" stroke-width="2"/>';
   const vestSvg=vest?`<path d="M33 58 L46 55 L48 112 L31 112Z" fill="${vest}"/><path d="M67 58 L54 55 L52 112 L69 112Z" fill="${vest}"/><circle cx="49.5" cy="72" r="1.4" fill="rgba(255,255,255,.6)"/><circle cx="49.5" cy="86" r="1.4" fill="rgba(255,255,255,.6)"/><circle cx="49.5" cy="100" r="1.4" fill="rgba(255,255,255,.6)"/>`:'';
   const THOBE='M32 56 Q50 50 68 56 L76 142 L24 142Z';
-  return `<g>${defs}${back}<rect x="34" y="136" width="12" height="14" fill="#D8D5CA"/><rect x="54" y="136" width="12" height="14" fill="#D8D5CA"/>${shoes}
+  return `<g>${defs}${gshadow}${back}<rect x="34" y="136" width="12" height="14" fill="#D8D5CA"/><rect x="54" y="136" width="12" height="14" fill="#D8D5CA"/>${shoes}${shoeHi}
     <rect x="44" y="46" width="12" height="14" fill="${sk}"/><circle cx="50" cy="34" r="15" fill="${sk}"/><path d="M35 32 Q50 16 65 32 Q50 24 35 32Z" fill="#2A1E17"/>
     <path d="${THOBE}" fill="${g}"/>${ov(THOBE)}${vestSvg}${collar}${placket}${hemB}${arms}${cuffs}${hands}${hat}${front}</g>`;
 }
 
 /* ---------- top bar ---------- */
 function renderTop(){$('#coins').textContent=S.coins;$('#stars').textContent=S.stars}
-function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
+function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200);say(t)}
+
+/* ---------- sound (off by default; S.sound is 'off', 'fx' or 'all') ----------
+   Effects are short single sounds made with Web Audio: no music, no melodies.
+   The narrator uses the browser's text-to-speech in English only. It never reads
+   Arabic script, and callers never pass it Qur'an, dua or dhikr transliterations,
+   because a synthetic voice would teach the wrong pronunciation. */
+let AC=null;
+function actx(){
+  if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;try{AC=new C()}catch(e){return null}}
+  if(AC.state==='suspended')AC.resume();return AC;
+}
+function tone(f1,f2,dur,type,vol,delay=0){
+  const a=actx();if(!a)return;const t=a.currentTime+delay,o=a.createOscillator(),g=a.createGain();
+  o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+.03);
+}
+function hiss(dur,freq,vol,delay=0){
+  const a=actx();if(!a)return;const t=a.currentTime+delay,n=Math.floor(a.sampleRate*dur),buf=a.createBuffer(1,n,a.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);
+  const src=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();
+  src.buffer=buf;f.type='bandpass';f.frequency.value=freq;f.Q.value=1.2;g.gain.value=vol;
+  src.connect(f).connect(g).connect(a.destination);src.start(t);
+}
+const SFX={
+  tap:()=>tone(880,620,.05,'sine',.07),
+  right:()=>tone(520,900,.2,'sine',.12),
+  wrong:()=>tone(240,150,.22,'triangle',.11),
+  coin:()=>tone(1300,1900,.14,'triangle',.07),
+  done:()=>{hiss(.4,4200,.12);tone(600,1000,.35,'sine',.07)},
+  flip:()=>hiss(.06,2000,.25),
+  pick:()=>tone(420,240,.09,'sine',.13),
+  steps:()=>{for(let k=0;k<4;k++)hiss(.05,500,.35,k*.18)},
+  whoosh:()=>hiss(.35,900,.22)
+};
+function sfx(n){if(S.sound==='off'||!SFX[n])return;try{SFX[n]()}catch(e){}}
+const narrOn=()=>S.sound==='all'&&'speechSynthesis' in window;
+function speakable(t){
+  return String(t).replace(/ﷺ/g,', peace be upon him,')
+    .replace(/[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]+/g,' ')
+    .replace(/[“”]/g,'').replace(/\s+([,.!?])/g,'$1').replace(/\s+/g,' ').trim();
+}
+let VOICE=null;
+function pickVoice(){const v=speechSynthesis.getVoices().filter(x=>/^en/i.test(x.lang));VOICE=v.find(x=>x.lang===navigator.language)||v.find(x=>/en-GB/i.test(x.lang))||v[0]||null}
+if('speechSynthesis' in window){try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}}
+function say(...parts){
+  if(!narrOn())return;const t=speakable(parts.filter(Boolean).join('. '));if(!t)return;
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);if(VOICE)u.voice=VOICE;u.lang=VOICE?VOICE.lang:'en-GB';u.rate=.95;u.pitch=1.05;say.last=t;speechSynthesis.speak(u)}catch(e){}
+}
+const SPK='<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-4v12l-4-4H3z" fill="currentColor"/><path d="M13 7a4 4 0 0 1 0 6M15.5 4.5a7.5 7.5 0 0 1 0 11" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>';
+const readBtn=()=>narrOn()?`<button class="btn alt ra" id="ra" aria-label="Read aloud">${SPK} Read aloud</button>`:'';
+
+/* ---------- town art (simple shapes, plus extra layers when graphics are Detailed) ---------- */
+const shadow=(x,y,rx)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${(rx*.1+2).toFixed(1)}" fill="rgba(0,0,0,.13)"/>`;
+const tree=(x,y,r)=>`<g>${shadow(x,y+r*1.1,r*.8)}<rect x="${x-2.5}" y="${y}" width="5" height="${r*1.1}" fill="var(--wood)"/><circle cx="${x}" cy="${y-r*.2}" r="${r}" fill="var(--leaf-dk)"/><circle cx="${x-r*.3}" cy="${y-r*.4}" r="${r*.72}" fill="var(--leaf)"/><circle cx="${x-r*.45}" cy="${y-r*.65}" r="${r*.24}" fill="rgba(255,255,255,.2)"/></g>`;
+const cloud=(x,y,k)=>`<g fill="var(--cloud)" opacity=".92"><ellipse cx="${x}" cy="${y}" rx="${26*k}" ry="${8*k}"/><circle cx="${x-8*k}" cy="${y-5*k}" r="${9*k}"/><circle cx="${x+7*k}" cy="${y-7*k}" r="${11*k}"/></g>`;
+const lamp=(x,y)=>`<g><rect x="${x-1.2}" y="${y-30}" width="2.4" height="30" fill="var(--ink)" opacity=".7"/><path d="M${x-5} ${y-30} H${x+5} L${x+3} ${y-40} H${x-3}Z" fill="var(--gold)"/><rect x="${x-4}" y="${y-42}" width="8" height="2.5" fill="var(--ink)" opacity=".7"/><circle cx="${x}" cy="${y-35}" r="7" fill="var(--sun)" opacity=".18"/></g>`;
+const palm=(x,y,h)=>{const tx=x+4,ty=y-h;
+  return `<g>${shadow(x,y,12)}<path d="M${x} ${y} Q${x-4} ${y-h/2} ${tx} ${ty}" stroke="var(--wood)" stroke-width="6" fill="none" stroke-linecap="round"/>`+
+  (GFX()?`<path d="M${x} ${y} Q${x-4} ${y-h/2} ${tx} ${ty}" stroke="rgba(0,0,0,.25)" stroke-width="6" fill="none" stroke-dasharray="1.5 5"/>`:'')+
+  [[-26,8],[-20,-8],[-6,-16],[8,-16],[22,-8],[28,8]].map(([dx,dy])=>`<path d="M${tx} ${ty} Q${tx+dx*.5} ${ty+dy-10} ${tx+dx} ${ty+dy}" stroke="var(--leaf)" stroke-width="5" fill="none" stroke-linecap="round"/>`).join('')+
+  `<g fill="#7A3E14"><circle cx="${tx-4}" cy="${ty+5}" r="2.6"/><circle cx="${tx+1}" cy="${ty+7}" r="2.6"/><circle cx="${tx+6}" cy="${ty+5}" r="2.6"/></g></g>`};
+const arch=(x,y,w,h,fill)=>`<path d="M${x} ${y+h} V${y+w/2} A${w/2} ${w/2} 0 0 1 ${x+w} ${y+w/2} V${y+h}Z" fill="${fill}"/>`;
+const bld=(id,label,x,y,w,h,lx,ly,name,inner)=>`<g class="bld" data-b="${id}" tabindex="0" role="button" aria-label="${label}"><rect class="hit" x="${x}" y="${y}" width="${w}" height="${h}"/>${inner}<text class="lbl" x="${lx}" y="${ly}">${name}</text></g>`;
+const sideShade=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#side)"/>`;
+
+function sceneDefs(){
+  return `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky1)"/><stop offset="1" style="stop-color:var(--sky2)"/></linearGradient>
+    <linearGradient id="grd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--ground)"/><stop offset="1" style="stop-color:var(--ground-dk)"/></linearGradient>
+    <radialGradient id="shine" cx=".35" cy=".25" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="side" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></linearGradient></defs>`;
+}
+function sceneBg(D){
+  let s='<rect width="360" height="456" fill="url(#sky)"/>';
+  if(!D)return s+'<ellipse cx="60" cy="50" rx="30" ry="9" fill="var(--sky2)" opacity=".9"/><ellipse cx="300" cy="36" rx="34" ry="10" fill="var(--sky2)" opacity=".9"/><path d="M0 150 Q90 124 180 142 T360 136 V456 H0Z" fill="var(--ground)"/>';
+  s+=`<g class="nite" fill="#fff" opacity=".8">${[[30,24],[84,60],[140,30],[232,52],[268,18],[340,92],[20,110],[200,14]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.2"/>`).join('')}</g>
+    <circle cx="318" cy="46" r="28" fill="var(--sun)" opacity=".2"/><circle cx="318" cy="46" r="17" fill="var(--sun)"/>
+    <g class="drift">${cloud(56,52,1)}${cloud(250,34,.8)}</g>
+    <g stroke="var(--ink)" stroke-width="1.3" fill="none" opacity=".45"><path d="M92 92 q4 -4 8 0 q4 -4 8 0"/><path d="M112 80 q3 -3 6 0 q3 -3 6 0"/></g>
+    <path d="M0 138 Q50 104 112 126 T230 112 T360 120 V170 H0Z" fill="var(--ground-dk)" opacity=".55"/>
+    <path d="M0 150 Q90 124 180 142 T360 136 V456 H0Z" fill="url(#grd)"/>
+    <g stroke="var(--ground-dk)" stroke-width="1.4" fill="none" stroke-linecap="round">${[[20,170],[128,186],[332,180],[150,262],[220,274],[16,330],[344,340],[126,452],[234,452],[340,452],[18,452],[130,318]].map(([x,y])=>`<path d="M${x} ${y} l-2 -5 M${x} ${y} l0 -6 M${x} ${y} l2 -5"/>`).join('')}</g>`;
+  return s;
+}
+function paths(D,list){
+  const p=list.map(d=>`<path d="${d}"/>`).join('');
+  return (D?`<g stroke="var(--path-dk)" stroke-width="22" stroke-linecap="round" fill="none">${p}</g>`:'')+
+    `<g stroke="var(--path)" stroke-width="18" stroke-linecap="round" fill="none">${p}</g>`+
+    (D?`<g stroke="rgba(0,0,0,.07)" stroke-width="16" stroke-dasharray="2 9" fill="none">${p}</g>`:'');
+}
+function gateArt(D,id,label,cx,top,name,lblY){
+  const L=cx-32,R=cx+22;
+  return bld(id,label,cx-48,top-26,96,100,cx,lblY,name,
+    (D?shadow(cx,top+64,40):'')+
+    `<rect x="${L}" y="${top+8}" width="10" height="56" fill="var(--wall)"/><rect x="${R}" y="${top+8}" width="10" height="56" fill="var(--wall)"/>`+
+    `<path d="M${L-4} ${top+10} Q${cx} ${top-26} ${R+14} ${top+10} V${top+16} Q${cx} ${top-16} ${L-4} ${top+16}Z" fill="var(--accent)"/>`+
+    (D?sideShade(L,top+8,10,56)+sideShade(R,top+8,10,56)+
+      `<rect x="${L-2}" y="${top+60}" width="14" height="5" fill="var(--wall-dk)"/><rect x="${R-2}" y="${top+60}" width="14" height="5" fill="var(--wall-dk)"/>`+
+      `<path d="M${L-4} ${top+10} Q${cx} ${top-26} ${R+14} ${top+10}" stroke="var(--gold)" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>`+
+      `<path d="M${cx} ${top-8} V${top+4}" stroke="var(--ink)" stroke-width="1" opacity=".6"/><path d="M${cx-4} ${top+4} H${cx+4} L${cx+3} ${top+12} H${cx-3}Z" fill="var(--gold)"/>`:''));
+}
+function artOld(D){
+  return paths(D,['M180 200 V440','M72 306 H288','M72 306 V440','M288 306 V440'])+
+  (D?tree(22,182,12)+tree(340,186,11)+tree(140,322,9)+tree(222,326,9)+lamp(154,300)+lamp(206,300):'')+
+  bld('masjid','Masjid: learn about salah',112,62,136,140,180,72,'Masjid',
+    (D?shadow(180,199,74):'')+
+    `<rect x="140" y="140" width="80" height="58" fill="var(--wall)"/>`+
+    (D?sideShade(140,140,80,58)+`<rect x="148" y="135" width="64" height="7" rx="1" fill="var(--wall-dk)"/><rect x="140" y="146" width="80" height="2.5" fill="var(--gold)"/>`+arch(148,164,9,18,'var(--accent-dk)')+arch(203,164,9,18,'var(--accent-dk)'):'')+
+    `<path d="M146 140 A34 34 0 0 1 214 140Z" fill="var(--accent)"/>`+
+    (D?`<path d="M146 140 A34 34 0 0 1 214 140Z" fill="url(#shine)"/><path d="M151 132 Q180 124 209 132" stroke="var(--gold)" stroke-width="1.6" fill="none" stroke-dasharray="2 3"/>`:'')+
+    `<path d="M180 106 V90" stroke="var(--gold)" stroke-width="3"/>`+
+    (D?'<path d="M183 78 A7 7 0 1 0 183 92 A5.6 5.6 0 1 1 183 78Z" fill="var(--gold)"/>':'<circle cx="180" cy="87" r="4" fill="var(--gold)"/>')+
+    `<rect x="122" y="104" width="14" height="94" fill="var(--wall)"/><rect x="224" y="104" width="14" height="94" fill="var(--wall)"/>
+    <path d="M120 104 L129 84 L138 104Z" fill="var(--accent)"/><path d="M222 104 L231 84 L240 104Z" fill="var(--accent)"/>`+
+    (D?sideShade(122,104,14,94)+sideShade(224,104,14,94)+
+      [122,224].map(x=>`<rect x="${x-3}" y="124" width="20" height="4" rx="1" fill="var(--wall-dk)"/><rect x="${x-2}" y="158" width="18" height="3" rx="1" fill="var(--wall-dk)"/><rect x="${x+5}" y="108" width="4" height="10" rx="2" fill="var(--accent-dk)"/><rect x="${x+5}" y="138" width="4" height="12" rx="2" fill="var(--accent-dk)"/><circle cx="${x+7}" cy="82" r="2" fill="var(--gold)"/>`).join(''):'')+
+    `<path d="M169 198 V178 A11 11 0 0 1 191 178 V198Z" fill="var(--ink)"/>`+
+    (D?'<path d="M166 198 V178 A14 14 0 0 1 194 178 V198" stroke="var(--gold)" stroke-width="2" fill="none"/><rect x="158" y="197" width="44" height="3" fill="var(--wall-dk)"/>':''))+
+  bld('madrasa',"Madrasa: Qur'an and Arabic letters",22,196,100,100,72,200,'Madrasa',
+    (D?shadow(72,293,44):'')+
+    `<rect x="36" y="236" width="72" height="56" fill="var(--wall)"/><path d="M30 236 L72 208 L114 236Z" fill="var(--accent)"/>`+
+    (D?sideShade(36,236,72,56)+'<path d="M36 252 H108 M36 266 H108 M36 280 H108" stroke="rgba(0,0,0,.06)"/><path d="M45 230 H99 M58 221 H86" stroke="var(--accent-dk)" stroke-width="1.5"/><rect x="28" y="234" width="88" height="4" rx="2" fill="var(--accent-dk)"/>'+
+      arch(42,250,12,16,'var(--sky1)')+arch(90,250,12,16,'var(--sky1)')+'<path d="M48 250 V266 M96 250 V266" stroke="var(--wall-dk)" stroke-width="1.5"/><rect x="60" y="244" width="24" height="12" rx="2" fill="var(--gold)"/><path d="M66 250 Q69 247 72 250 Q75 247 78 250 V253 Q75 251 72 253 Q69 251 66 253Z" fill="#fff"/>'
+      :'<circle cx="48" cy="256" r="6" fill="var(--sky1)"/><circle cx="96" cy="256" r="6" fill="var(--sky1)"/>')+
+    `<path d="M64 292 V270 A8 8 0 0 1 80 270 V292Z" fill="var(--ink)"/>`)+
+  bld('library','Library: stories of the prophets',238,196,100,100,288,204,'Library',
+    (D?shadow(288,296,46):'')+
+    `<rect x="252" y="236" width="72" height="56" fill="var(--wall)"/><path d="M246 236 L288 212 L330 236Z" fill="var(--gold)"/>`+
+    (D?sideShade(252,236,72,56)+'<path d="M258 234 L288 218 L318 234Z" fill="var(--gold-dk)" opacity=".45"/><path d="M280 229 Q284 225 288 229 Q292 225 296 229 V233 Q292 231 288 233 Q284 231 280 233Z" fill="#fff"/><rect x="248" y="235" width="80" height="5" fill="var(--wall-dk)"/>':'')+
+    `<g stroke="var(--accent)" stroke-width="4"><path d="M262 242 V292"/><path d="M280 242 V292"/><path d="M296 242 V292"/><path d="M314 242 V292"/></g>`+
+    (D?[262,280,296,314].map(x=>`<rect x="${x-4}" y="240" width="8" height="3" fill="var(--accent-dk)"/><rect x="${x-4}" y="289" width="8" height="3" fill="var(--accent-dk)"/>`).join('')+'<rect x="248" y="292" width="80" height="3" fill="var(--wall-dk)"/><rect x="244" y="295" width="88" height="3" fill="var(--path-dk)"/>':''))+
+  bld('garden','Garden of Adab: good manners',22,336,100,106,72,350,'Garden of Adab',
+    (D?'<rect x="26" y="424" width="92" height="10" rx="5" fill="var(--leaf-dk)"/>'+shadow(49,420,16)+shadow(97,420,12):'')+
+    `<rect x="46" y="396" width="6" height="24" fill="#7A5430"/><rect x="94" y="402" width="6" height="18" fill="#7A5430"/>
+    <circle cx="49" cy="384" r="20" fill="var(--good)"/><circle cx="97" cy="392" r="15" fill="var(--good)" opacity=".85"/>`+
+    (D?'<circle cx="43" cy="377" r="12" fill="var(--leaf)"/><circle cx="39" cy="372" r="4" fill="rgba(255,255,255,.2)"/><circle cx="93" cy="387" r="9" fill="var(--leaf)"/><rect x="62" y="404" width="24" height="3.5" rx="1" fill="var(--wood)"/><rect x="62" y="398" width="24" height="2.5" rx="1" fill="var(--wood)"/><rect x="64" y="407" width="2" height="7" fill="var(--wood)"/><rect x="82" y="407" width="2" height="7" fill="var(--wood)"/>'+
+      [[60,420],[72,424],[86,419],[34,428],[108,428]].map(([x,y],i)=>`<g fill="${i%2?'#E58AA5':'#F2C94C'}"><circle cx="${x-2.5}" cy="${y}" r="2.4"/><circle cx="${x+2.5}" cy="${y}" r="2.4"/><circle cx="${x}" cy="${y-2.5}" r="2.4"/><circle cx="${x}" cy="${y+2.5}" r="2.4"/></g><circle cx="${x}" cy="${y}" r="1.5" fill="#fff"/>`).join('')
+      :'<g fill="var(--gold)"><circle cx="66" cy="418" r="3"/><circle cx="76" cy="422" r="3"/><circle cx="86" cy="417" r="3"/></g>'))+
+  bld('market','Sadaqah Market: giving',238,336,100,106,288,360,'Sadaqah Market',
+    (D?shadow(288,422,42):'')+
+    `<rect x="256" y="390" width="64" height="30" fill="var(--wall)"/>`+
+    (D?sideShade(256,390,64,30)+'<rect x="262" y="400" width="18" height="12" fill="var(--wood)"/><rect x="296" y="400" width="18" height="12" fill="var(--wood)"/><g fill="#D9575F"><circle cx="267" cy="399" r="3"/><circle cx="273" cy="398" r="3"/></g><g fill="#E8963A"><circle cx="301" cy="399" r="3"/><circle cx="308" cy="398" r="3"/></g><rect x="252" y="388" width="72" height="3" fill="var(--wood)"/>':'')+
+    `<path d="M250 372 H326 L320 392 H256Z" fill="var(--accent)"/><path d="M269 372 L265 392 H277 L281 372Z" fill="var(--gold)"/><path d="M297 372 L293 392 H305 L309 372Z" fill="var(--gold)"/>`+
+    (D?[260,268,276,284,292,300,308,316].map((x,i)=>`<circle cx="${x}" cy="392" r="4" fill="${i===2||i===5?'var(--gold)':'var(--accent)'}"/>`).join('')+'<path d="M288 396 V401" stroke="var(--ink)" stroke-width="1"/><path d="M285 401 H291 L290 408 H286Z" fill="var(--gold)"/>':'')+
+    `<rect x="252" y="388" width="4" height="34" fill="#7A5430"/><rect x="320" y="388" width="4" height="34" fill="#7A5430"/>`)+
+  gateArt(D,'gate','Walk to the Riverside Quarter',180,372,'To Riverside',352);
+}
+function artRiver(D){
+  const river='M0 298 Q90 284 180 302 T360 296 V338 Q270 326 180 340 T0 334Z';
+  return paths(D,['M180 200 V440','M72 262 H288','M72 440 H288'])+
+  `<path d="${river}" fill="var(--water)"/>`+
+  (D?`<g class="ripple" stroke="#fff" stroke-width="1.4" fill="none" opacity=".55" stroke-linecap="round"><path d="M30 316 q8 -4 16 0"/><path d="M110 322 q8 -4 16 0"/><path d="M238 314 q8 -4 16 0"/><path d="M316 320 q8 -4 16 0"/></g>
+    <g fill="var(--leaf)"><path d="M70 326 a7 4 0 1 0 6 -3 l-6 3Z"/><path d="M290 324 a7 4 0 1 0 6 -3 l-6 3Z"/></g>
+    <g stroke="var(--leaf-dk)" stroke-width="2" stroke-linecap="round"><path d="M8 300 V286 M13 302 V290 M346 300 V286 M352 302 V292"/></g>`+
+    tree(124,280,9)+tree(236,280,9)+tree(22,384,10)+lamp(158,296)+lamp(202,296):'')+
+  `<rect x="162" y="290" width="36" height="54" fill="var(--path)"/><rect x="158" y="288" width="4" height="58" rx="2" fill="var(--wood)"/><rect x="198" y="288" width="4" height="58" rx="2" fill="var(--wood)"/>`+
+  (D?'<path d="M162 298 H198 M162 306 H198 M162 314 H198 M162 322 H198 M162 330 H198 M162 338 H198" stroke="var(--path-dk)" stroke-width="1.2"/><g fill="var(--wood)"><circle cx="160" cy="288" r="3"/><circle cx="200" cy="288" r="3"/><circle cx="160" cy="346" r="3"/><circle cx="200" cy="346" r="3"/></g>':'')+
+  gateArt(D,'gate','Walk back to the Old Town',180,140,'To Old Town',118)+
+  bld('home','My Home: dua of the day',22,150,100,104,72,160,'My Home',
+    (D?shadow(72,252,46):'')+
+    `<rect x="34" y="202" width="76" height="50" fill="var(--wall)"/><rect x="30" y="194" width="84" height="9" fill="var(--wall-dk)"/>`+
+    (D?sideShade(34,202,76,50)+[32,44,56,68,80,92,104].map(x=>`<rect x="${x}" y="189" width="7" height="6" fill="var(--wall-dk)"/>`).join('')+'<circle cx="40" cy="186" r="4" fill="var(--leaf)"/><circle cx="104" cy="186" r="4" fill="var(--leaf)"/>':'')+
+    `<rect x="42" y="212" width="14" height="16" fill="var(--sky1)"/><rect x="88" y="212" width="14" height="16" fill="var(--sky1)"/>`+
+    (D?'<g stroke="var(--wood)" stroke-width="1.2"><path d="M42 216 H56 M42 220 H56 M42 224 H56 M46 212 V228 M52 212 V228 M88 216 H102 M88 220 H102 M88 224 H102 M92 212 V228 M98 212 V228"/></g><rect x="40" y="210" width="18" height="20" fill="none" stroke="var(--wood)" stroke-width="2"/><rect x="86" y="210" width="18" height="20" fill="none" stroke="var(--wood)" stroke-width="2"/><path d="M38 252 h8 l-1.5 -7 h-5Z" fill="#B5762B"/><circle cx="42" cy="242" r="4" fill="var(--leaf)"/>':'')+
+    arch(64,228,16,24,'var(--wood)')+(D?'<circle cx="77" cy="241" r="1.2" fill="var(--gold)"/><rect x="60" y="251" width="24" height="3" fill="var(--wall-dk)"/>':''))+
+  bld('wudu','Wudu Fountain: steps of wudu',238,146,100,108,288,156,'Wudu Fountain',
+    (D?shadow(288,244,40):'')+
+    `<rect x="262" y="184" width="6" height="52" fill="var(--wall)"/><rect x="308" y="184" width="6" height="52" fill="var(--wall)"/>
+    <path d="M266 182 A22 22 0 0 1 310 182Z" fill="var(--accent)"/><rect x="256" y="180" width="64" height="6" rx="1" fill="var(--wall-dk)"/>
+    <ellipse cx="288" cy="240" rx="36" ry="9" fill="var(--wall-dk)"/><ellipse cx="288" cy="236" rx="33" ry="7" fill="var(--water)"/>
+    <rect x="285" y="212" width="6" height="24" fill="var(--wall)"/><ellipse cx="288" cy="212" rx="10" ry="3" fill="var(--wall-dk)"/>`+
+    (D?'<path d="M266 182 A22 22 0 0 1 310 182Z" fill="url(#shine)"/><path d="M288 160 V152" stroke="var(--gold)" stroke-width="2"/><circle cx="288" cy="150" r="2.5" fill="var(--gold)"/>'+
+      '<g class="ripple" stroke="var(--water)" stroke-width="2" fill="none" stroke-linecap="round"><path d="M280 212 Q272 218 270 232"/><path d="M296 212 Q304 218 306 232"/><path d="M288 210 V202"/></g>'+
+      '<g fill="var(--ink)" opacity=".6"><rect x="262" y="241" width="3" height="5"/><rect x="276" y="243" width="3" height="5"/><rect x="297" y="243" width="3" height="5"/><rect x="311" y="241" width="3" height="5"/></g><ellipse cx="282" cy="235" rx="8" ry="1.6" fill="#fff" opacity=".4"/>':''))+
+  bld('park','Play Park: letter match and kindness',22,342,100,102,72,352,'Play Park',
+    (D?shadow(56,424,30)+shadow(102,424,16)+'<ellipse cx="102" cy="428" rx="18" ry="5" fill="#E6D6AE"/>':'')+
+    `<g stroke="var(--wood)" stroke-width="3.5" stroke-linecap="round"><path d="M30 376 H78"/><path d="M30 376 L24 424 M30 376 L36 424 M78 376 L72 424 M78 376 L84 424"/></g>
+    <path d="M47 376 V404 M63 376 V404" stroke="var(--ink)" stroke-width="1.2" opacity=".7"/><rect x="44" y="403" width="22" height="4" rx="2" fill="var(--accent)"/>
+    <path d="M92 384 V424 M100 384 V424" stroke="var(--ink)" stroke-width="2" opacity=".6"/><path d="M92 392 H100 M92 400 H100 M92 408 H100 M92 416 H100" stroke="var(--ink)" stroke-width="1.5" opacity=".6"/>
+    <path d="M100 384 Q106 384 110 404 Q113 420 120 424" stroke="var(--gold)" stroke-width="6" fill="none" stroke-linecap="round"/>`+
+    (D?'<path d="M100 384 Q106 384 110 404 Q113 420 120 424" stroke="rgba(255,255,255,.35)" stroke-width="1.5" fill="none"/><rect x="89" y="381" width="14" height="4" rx="1" fill="var(--accent)"/><circle cx="40" cy="430" r="5" fill="#D9575F"/><path d="M36 428 Q40 431 44 428" stroke="#fff" stroke-width="1" fill="none"/>':''))+
+  bld('pillars','Pillars Hall: the five pillars of Islam',130,342,100,102,180,352,'Pillars Hall',
+    (D?shadow(180,418,46):'')+
+    `<rect x="138" y="408" width="84" height="8" fill="var(--wall-dk)"/><path d="M134 372 L180 358 L226 372Z" fill="var(--accent)"/><rect x="138" y="371" width="84" height="6" fill="var(--wall)"/>`+
+    [150,165,180,195,210].map(x=>`<rect x="${x-3}" y="377" width="6" height="31" fill="var(--wall)"/>`).join('')+
+    (D?'<path d="M134 372 L180 358 L226 372Z" fill="url(#shine)"/><g fill="var(--gold)" transform="translate(180 367)"><rect x="-3" y="-3" width="6" height="6"/><rect x="-3" y="-3" width="6" height="6" transform="rotate(45)"/></g>'+
+      [150,165,180,195,210].map(x=>`<rect x="${x-4.5}" y="377" width="9" height="2.5" fill="var(--wall-dk)"/><rect x="${x-4.5}" y="405" width="9" height="3" fill="var(--wall-dk)"/><rect x="${x+1}" y="380" width="2" height="25" fill="rgba(0,0,0,.1)"/>`).join('')+'<rect x="134" y="415" width="92" height="3" fill="var(--path-dk)"/>':''))+
+  bld('orchard','Date Orchard: harvest and sharing',238,342,100,102,288,352,'Date Orchard',
+    palm(262,424,58)+palm(314,428,52)+
+    `<path d="M276 418 H300 L297 430 H279Z" fill="var(--wood)"/><g fill="#7A3E14"><circle cx="283" cy="417" r="2.6"/><circle cx="288" cy="416" r="2.6"/><circle cx="293" cy="417" r="2.6"/></g>`+
+    (D?'<path d="M278 422 H298 M279 426 H297" stroke="rgba(0,0,0,.2)" stroke-width="1"/>':''));
+}
 
 /* ---------- town ---------- */
-function renderTown(){
+function renderTown(fade){
   const lvl=Math.min(Math.floor(S.stars/10),LEVELS.length-1), into=S.stars%10, p=lvl>=LEVELS.length-1&&S.stars>=50?100:into*10;
-  const [x,y]=SPOTS[pos], nm=S.name.trim();
+  const Z=ZONES[zone], [x,y]=Z.spots[pos]||Z.spots.start, nm=S.name.trim(), D=GFX();
   $('#view').innerHTML=`
   <div class="hello">${nm?'Assalamu alaykum, '+esc(nm)+'!':'Assalamu alaykum!'} Tap a place to walk there.</div>
-  <div class="scene"><svg viewBox="0 0 360 456" role="group" aria-label="Town map">
-    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky1)"/><stop offset="1" style="stop-color:var(--sky2)"/></linearGradient></defs>
-    <rect width="360" height="456" fill="url(#sky)"/>
-    <ellipse cx="60" cy="50" rx="30" ry="9" fill="var(--sky2)" opacity=".9"/><ellipse cx="300" cy="36" rx="34" ry="10" fill="var(--sky2)" opacity=".9"/>
-    <path d="M0 150 Q90 124 180 142 T360 136 V456 H0Z" fill="var(--ground)"/>
-    <g stroke="var(--path)" stroke-width="18" stroke-linecap="round" fill="none"><path d="M180 200 V306"/><path d="M72 306 H288"/><path d="M72 306 V440"/><path d="M288 306 V440"/></g>
-
-    <g class="bld" data-b="masjid" tabindex="0" role="button" aria-label="Masjid: learn about salah">
-      <rect class="hit" x="112" y="62" width="136" height="140"/>
-      <rect x="140" y="140" width="80" height="58" fill="var(--wall)"/>
-      <path d="M146 140 A34 34 0 0 1 214 140Z" fill="var(--accent)"/><path d="M180 98 V90" stroke="var(--gold)" stroke-width="3"/><circle cx="180" cy="87" r="4" fill="var(--gold)"/>
-      <rect x="122" y="104" width="14" height="94" fill="var(--wall)"/><rect x="224" y="104" width="14" height="94" fill="var(--wall)"/>
-      <path d="M120 104 L129 84 L138 104Z" fill="var(--accent)"/><path d="M222 104 L231 84 L240 104Z" fill="var(--accent)"/>
-      <path d="M169 198 V178 A11 11 0 0 1 191 178 V198Z" fill="var(--ink)"/>
-      <text class="lbl" x="180" y="72">Masjid</text></g>
-
-    <g class="bld" data-b="madrasa" tabindex="0" role="button" aria-label="Madrasa: Qur'an and Arabic letters">
-      <rect class="hit" x="22" y="196" width="100" height="100"/>
-      <rect x="36" y="236" width="72" height="56" fill="var(--wall)"/><path d="M30 236 L72 208 L114 236Z" fill="var(--accent)"/>
-      <path d="M64 292 V270 A8 8 0 0 1 80 270 V292Z" fill="var(--ink)"/>
-      <circle cx="48" cy="256" r="6" fill="var(--sky1)"/><circle cx="96" cy="256" r="6" fill="var(--sky1)"/>
-      <text class="lbl" x="72" y="200">Madrasa</text></g>
-
-    <g class="bld" data-b="library" tabindex="0" role="button" aria-label="Library: stories of the prophets">
-      <rect class="hit" x="238" y="196" width="100" height="100"/>
-      <rect x="252" y="236" width="72" height="56" fill="var(--wall)"/><path d="M246 236 L288 212 L330 236Z" fill="var(--gold)"/>
-      <g stroke="var(--accent)" stroke-width="4"><path d="M262 242 V292"/><path d="M280 242 V292"/><path d="M296 242 V292"/><path d="M314 242 V292"/></g>
-      <text class="lbl" x="288" y="204">Library</text></g>
-
-    <g class="bld" data-b="garden" tabindex="0" role="button" aria-label="Garden of Adab: good manners">
-      <rect class="hit" x="22" y="336" width="100" height="106"/>
-      <rect x="46" y="396" width="6" height="24" fill="#7A5430"/><rect x="94" y="402" width="6" height="18" fill="#7A5430"/>
-      <circle cx="49" cy="384" r="20" fill="var(--good)"/><circle cx="97" cy="392" r="15" fill="var(--good)" opacity=".85"/>
-      <g fill="var(--gold)"><circle cx="66" cy="418" r="3"/><circle cx="76" cy="422" r="3"/><circle cx="86" cy="417" r="3"/></g>
-      <text class="lbl" x="72" y="350">Garden of Adab</text></g>
-
-    <g class="bld" data-b="market" tabindex="0" role="button" aria-label="Sadaqah Market: giving">
-      <rect class="hit" x="238" y="336" width="100" height="106"/>
-      <rect x="256" y="390" width="64" height="30" fill="var(--wall)"/>
-      <path d="M250 372 H326 L320 392 H256Z" fill="var(--accent)"/><path d="M269 372 L265 392 H277 L281 372Z" fill="var(--gold)"/><path d="M297 372 L293 392 H305 L309 372Z" fill="var(--gold)"/>
-      <rect x="252" y="388" width="4" height="34" fill="#7A5430"/><rect x="320" y="388" width="4" height="34" fill="#7A5430"/>
-      <text class="lbl" x="288" y="360">Sadaqah Market</text></g>
-
+  <div class="seg zonebar" role="group" aria-label="District">${Object.entries(ZONES).map(([k,z])=>`<button data-z="${k}" aria-pressed="${k===zone}">${z.n}</button>`).join('')}</div>
+  <div class="scene${fade?' zone-in':''}"><svg viewBox="0 0 360 456" role="group" aria-label="${Z.n} map">
+    ${sceneDefs()}${sceneBg(D)}${zone==='old'?artOld(D):artRiver(D)}
     <g class="me" id="me" style="transform:translate(${x-22.5}px,${y-68}px) scale(.45)">${avatar(S)}</g>
   </svg></div>
   <div class="card level"><div style="display:flex;justify-content:space-between;gap:8px"><b>Level ${lvl+1}: ${LEVELS[lvl]}</b><span class="hint">${S.stars} stars</span></div>
@@ -391,27 +647,43 @@ function renderTown(){
     <p class="hint">Stars show how much you have learned.</p></div>
   <div class="card"><h3>How to earn coins</h3>
     <div class="group"><p class="hint"><b>Quizzes:</b> 3 coins for each correct answer, once per quiz each day.</p>
-    <p class="hint"><b>Order the prayer</b> at the Masjid: 10 coins, once a day.</p>
+    <p class="hint"><b>Order games</b> (prayer, wudu, five pillars): 10 coins each, once a day.</p>
+    <p class="hint"><b>Riverside games:</b> letter match, date harvest and the dua of the day pay once a day too.</p>
     <p class="hint"><b>Daily deeds:</b> 3 coins for every good deed you tick.</p></div>
-    <p class="hint">Spend coins in the Wardrobe on colours, trim, shoes and accessories. Give some at the Sadaqah Market too.</p></div>`;
+    <p class="hint">Spend coins in the Wardrobe on colours, trim, shoes and accessories. Give some at the Sadaqah Market too.</p></div>
+  <div class="card"><h3>Graphics</h3>
+    <div class="seg" role="group" aria-label="Graphics"><button data-gfx="detailed" aria-pressed="${D}">Detailed</button><button data-gfx="simple" aria-pressed="${!D}">Simple</button></div>
+    <p class="hint">Simple uses plainer pictures and no moving clouds. It can be faster on older phones.</p></div>
+  <div class="card"><h3>Sound</h3>
+    <div class="seg" role="group" aria-label="Sound">${[['off','Off'],['fx','Effects'],['all','Effects and narrator']].map(([k,n])=>`<button data-snd="${k}" aria-pressed="${S.sound===k}">${n}</button>`).join('')}</div>
+    <p class="hint">Off by default. Effects are short taps and chimes, never music. The narrator reads questions and instructions in English. It never reads Arabic, so learn the Qur’an and duas from a real teacher.</p></div>`;
 }
-const PLACES={masjid:'Masjid',madrasa:'Madrasa',library:'Library',garden:'Garden of Adab',market:'Sadaqah Market'};
+const PLACES={masjid:'Masjid',madrasa:'Madrasa',library:'Library',garden:'Garden of Adab',market:'Sadaqah Market',home:'My Home',wudu:'Wudu Fountain',park:'Play Park',pillars:'Pillars Hall',orchard:'Date Orchard'};
+let walking=false;
 function goPlace(b){
-  pos=b; const me=$('#me'); if(!me)return; const [x,y]=SPOTS[b];
+  const Z=ZONES[zone]; if(!Z.spots[b]||walking)return;
+  pos=b; const me=$('#me'); if(!me)return; const [x,y]=Z.spots[b];
   me.style.transform=`translate(${x-22.5}px,${y-68}px) scale(.45)`;
   const delay=matchMedia('(prefers-reduced-motion:reduce)').matches?0:750;
-  setTimeout(()=>openPlace(b),delay);
+  walking=true;if(delay)sfx('steps');
+  setTimeout(()=>{
+    walking=false; if(tab!=='town')return;
+    if(b==='gate'){zone=Z.other;S.zone=zone;save();pos='gate';renderTown(true);sfx('whoosh');toast('Welcome to the '+ZONES[zone].n+'!');return}
+    openPlace(b);
+  },delay);
 }
 
 /* ---------- sheet ---------- */
 let sheetGen=0;
-function openSheet(title){sheetGen++;$('#sh-t').textContent=title;$('#ov').hidden=false;$('#sh-x').focus()}
-function closeSheet(){sheetGen++;$('#ov').hidden=true;if(tab==='town')renderTown()}
+function stopAudio(){if(listen.stop)listen.stop();if(window.speechSynthesis)speechSynthesis.cancel()}
+function openSheet(title){stopAudio();sheetGen++;$('#sh-t').textContent=title;$('#ov').hidden=false;$('#sh-x').focus()}
+function closeSheet(){stopAudio();sheetGen++;$('#ov').hidden=true;if(tab==='town')renderTown()}
 function body(html){const b=$('#sh-b');b.innerHTML=html;return b}
 function menu(title,items){
   openSheet(title);
   const b=body(items.map((it,i)=>`<button class="act" data-i="${i}" style="margin-bottom:10px"><b>${it[0]}</b><span>${it[1]}</span></button>`).join(''));
-  b.querySelectorAll('.act').forEach(btn=>btn.onclick=()=>items[+btn.dataset.i][2]());
+  b.querySelectorAll('.act').forEach(btn=>btn.onclick=()=>{sfx('tap');items[+btn.dataset.i][2]()});
+  say(title,'Choose one: '+items.map(it=>it[0]).join(', '));
 }
 function openPlace(b){
   if(b==='masjid')menu('Masjid',[['Order the prayer','Put one rak\u2019ah in the right order',orderGame],['Salah questions','5 quick questions',()=>quiz('salah')],['Dzikir counter','33, 33 and 34 after prayer',dzikirCounter],['Dzikir check','What the words mean',()=>quiz('dzikir')]]);
@@ -419,9 +691,23 @@ function openPlace(b){
   if(b==='library')quiz('prophets');
   if(b==='garden')quiz('adab');
   if(b==='market')market();
+  if(b==='home'){const d=todayDua();menu('My Home',[['Dua of the day',d.n+'. Learn it and practise saying it.',()=>duaCard(d,true)],['Which dua?','Match each dua to the right moment',duaQuiz],['All duas',DUAS.length+' everyday duas to learn',duaList]])}
+  if(b==='wudu')menu('Wudu Fountain',[['Steps of wudu','Put the steps in the right order',wuduGame],['Wudu questions','5 quick questions',()=>quiz('wudu')]]);
+  if(b==='park')menu('Play Park',[['Letter match','Find the pairs: each letter and its name',matchGame],['Kind or not?','Is it a kind thing to do?',()=>quiz('kind')]]);
+  if(b==='pillars')menu('Pillars Hall',[['Five pillars in order','Tap them from the first to the fifth',pillarsGame],['Pillars questions','5 quick questions',()=>quiz('pillars')]]);
+  if(b==='orchard')menu('Date Orchard',[['Date harvest','Pick only the ripe dates',harvest],['Share the dates','Counting, sharing and adding up',mathQuiz]]);
+}
+/* history for the parent view: what was finished on each day, kept for 60 days */
+function dayLog(){const d=today();return S.hist[d]=S.hist[d]||{a:{},d:[]}}
+function track(id){
+  const h=dayLog();h.a[id]=(h.a[id]||0)+1;
+  const ks=Object.keys(S.hist);if(ks.length>60)ks.sort((a,b)=>new Date(a)-new Date(b)).slice(0,ks.length-60).forEach(k=>delete S.hist[k]);
+  save();
 }
 function reward(id,coins,stars){
-  if(S.done[id]===today())return 'Practice round. You already collected today’s reward here.';
+  track(id);
+  if(S.done[id]===today()){sfx('done');return 'Practice round. You already collected today’s reward here.'}
+  sfx('coin');
   S.done[id]=today();S.coins+=coins;S.stars+=stars;save();renderTop();
   return `+${coins} coins, +${stars} stars`;
 }
@@ -433,20 +719,25 @@ function quiz(id,custom){
   const ask=()=>{
     const q=list[i];
     const b=body(`<div class="prog"><span>Question ${i+1} of ${list.length}</span><span>${score} correct</span></div>
-      <p class="q">${esc(q.q)}</p>${q.pre?`<p class="aya" dir="rtl" lang="ar">${esc(q.pre)}</p>`:''}
+      <p class="q">${esc(q.q)}</p>${readBtn()}${q.pre?`<p class="aya" dir="rtl" lang="ar">${esc(q.pre)}</p>`:''}
       <div class="choices ${q.big?'grid':''}">${q.o.map((o,k)=>`<button class="ch ${q.big?'ar':''} ${q.long?'arl':''}" data-k="${k}">${esc(o)}</button>`).join('')}</div><div id="fb"></div>`);
+    const spoken=()=>say(q.q,!q.big&&!q.long?'Is it '+q.o.join(', or ')+'?':'');spoken();
+    if($('#ra'))$('#ra').onclick=spoken;
     b.querySelectorAll('.ch').forEach(btn=>btn.onclick=()=>{
-      const pick=q.o[+btn.dataset.k], ok=pick===q.a;
+      const pick=q.o[+btn.dataset.k], ok=pick===q.a;sfx(ok?'right':'wrong');
       b.querySelectorAll('.ch').forEach(c=>{c.disabled=true;if(q.o[+c.dataset.k]===q.a)c.classList.add('right')});
       if(!ok)btn.classList.add('wrong'); else score++;
       $('#fb').innerHTML=`<p class="fb"><b>${ok?'Masha’Allah, correct!':'Not this time.'}</b> ${esc(q.e)}</p><button class="btn" id="nx" style="margin-top:10px;width:100%">${i+1<list.length?'Next':'See result'}</button>`;
+      say(ok?'Masha Allah, correct!':'Not this time. The answer is '+(q.big||q.long?'shown in green':q.a)+'.',q.e);
       $('#nx').focus();$('#nx').onclick=()=>{i++;i<list.length?ask():finish()};
     });
   };
   const finish=()=>{
-    const msg=reward('q:'+(custom?custom.id:id),score*3,score);
+    const qk=custom?custom.id:id, bq=S.best[qk]||{s:0,n:list.length,t:0};
+    S.best[qk]={s:Math.max(bq.s,score),n:list.length,t:bq.t+1,last:score};
+    const msg=reward('q:'+qk,score*3,score);
     body(`<p class="big">${score} / ${list.length}</p>
-      <p class="q" style="text-align:center">${score===list.length?'Masha’Allah! Perfect.':score>=list.length/2?'Well done. Keep learning.':'Good effort. Try again to learn more.'}</p>
+      <p class="q" style="text-align:center">${score===list.length?'Masha’Allah! Perfect.':score>=list.length/2?'Well done. Keep learning.':'Good effort. Try again to learn more.'}</p>${(say(`You got ${score} out of ${list.length}`,score===list.length?'Masha Allah! Perfect.':score>=list.length/2?'Well done. Keep learning.':'Good effort. Try again to learn more.'),'')}
       <p class="fb" style="text-align:center">${msg}</p>
       <div class="row"><button class="btn" id="again">Play again</button><button class="btn alt" id="home">Back to town</button></div>`);
     $('#again').onclick=()=>custom?custom.again():quiz(id);$('#home').onclick=closeSheet;
@@ -457,18 +748,121 @@ function letterQuiz(){
   const items=shuffle(LETTERS).slice(0,5).map(([g,n])=>({q:`Tap the letter ${n}.`,a:g,o:shuffle(LETTERS.map(l=>l[0]).filter(x=>x!==g)).slice(0,3).concat(g),e:`${g} is ${n}.`,big:true}));
   quiz('letters',{id:'letters',again:letterQuiz,title:'Arabic letters',items});
 }
-function orderGame(){
-  openSheet('Order the prayer');
-  let next=0; const order=shuffle(PRAYER_STEPS.map((t,i)=>({t,i})));
-  const b=body(`<p class="hint">Tap the steps of one rak’ah in the right order, starting with the first.</p>
+/* order games: tap steps from first to last */
+function orderSteps(title,steps,rid,intro,doneHtml,again){
+  openSheet(title);
+  let next=0; const order=shuffle(steps.map((t,i)=>({t,i})));
+  say(title,intro);
+  const b=body(`<p class="hint">${intro}</p>${readBtn()}
     <div class="steps">${order.map(s=>`<button class="step" data-i="${s.i}"><span class="n"></span><span>${esc(s.t)}</span></button>`).join('')}</div><div id="fb"></div>`);
   b.querySelectorAll('.step').forEach(btn=>btn.onclick=()=>{
     const i=+btn.dataset.i;
-    if(i===next){btn.classList.add('ok');btn.disabled=true;btn.querySelector('.n').textContent=++next;
-      if(next===PRAYER_STEPS.length){const msg=reward('order',10,5);
-        $('#fb').innerHTML=`<p class="fb"><b>Masha’Allah, that is one rak’ah!</b> Ask your teacher to show you the full prayer. ${msg}</p><button class="btn alt" id="home" style="margin-top:10px;width:100%">Back to town</button>`;$('#home').onclick=closeSheet}}
-    else{btn.classList.remove('shake');void btn.offsetWidth;btn.classList.add('shake');toast('Not yet. Think about step '+(next+1)+'.')}
+    if(i===next){btn.classList.add('ok');btn.disabled=true;btn.querySelector('.n').textContent=++next;sfx('right');say('Step '+next+'. '+steps[i]);
+      if(next===steps.length){const msg=reward(rid,10,5);setTimeout(()=>say(doneHtml.replace(/<[^>]+>/g,'')),1400);
+        $('#fb').innerHTML=`<p class="fb">${doneHtml} ${msg}</p><div class="row" style="margin-top:10px"><button class="btn" id="again">Play again</button><button class="btn alt" id="home">Back to town</button></div>`;
+        $('#again').onclick=again;$('#home').onclick=closeSheet;$('#home').focus()}}
+    else{btn.classList.remove('shake');void btn.offsetWidth;btn.classList.add('shake');sfx('wrong');toast('Not yet. Think about step '+(next+1)+'.')}
   });
+  if($('#ra'))$('#ra').onclick=()=>say(intro,'The steps are: '+order.map(o=>o.t).join('. '));
+}
+const orderGame=()=>orderSteps('Order the prayer',PRAYER_STEPS,'order','Tap the steps of one rak’ah in the right order, starting with the first.','<b>Masha’Allah, that is one rak’ah!</b> Ask your teacher to show you the full prayer.',orderGame);
+const wuduGame=()=>orderSteps('Steps of wudu',WUDU_STEPS,'wudu','Tap the steps of wudu in the right order, starting with the first.','<b>Masha’Allah, your wudu is complete!</b> Ask a parent or teacher to show you each step with real water.',wuduGame);
+const pillarsGame=()=>orderSteps('Five pillars in order',PILLARS,'pillars','Tap the five pillars of Islam in the order they are usually taught.','<b>Masha’Allah!</b> Like the pillars of a building, these five hold up a Muslim’s life.',pillarsGame);
+
+/* duas (My Home) */
+const dayNum=()=>{const d=new Date();return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)};
+const todayDua=()=>DUAS[dayNum()%DUAS.length];
+const asText=d=>({id:d.id,n:d.n,m:d.m,t:d.t,a:[d.ar],dua:true});
+function duaCard(d,isToday){
+  openSheet(isToday?'Dua of the day':d.n);
+  body(`<p class="q" style="text-align:center">${esc(d.n)}</p>
+    <p class="aya" lang="ar" dir="rtl">${d.ar}</p>
+    <p class="translit">${esc(d.t)}</p>
+    <p class="fb"><b>Meaning:</b> ${esc(d.m)}${d.src?` <small>(${esc(d.src)})</small>`:''}</p>
+    <p class="note">We say it ${esc(d.when)}. Learn how to say it from a parent or teacher, then practise here.</p>
+    <div class="row"><button class="btn" id="pr">Practise saying it</button><button class="btn alt" id="home">${isToday?'Back to town':'All duas'}</button></div>`);
+  $('#pr').onclick=()=>recite(d.id);$('#home').onclick=isToday?closeSheet:duaList;
+  say((isToday?'The dua of the day is for: ':'The dua for: ')+d.n,'It means: '+d.m,'We say it '+d.when+'. Ask a parent or teacher to teach you how to say it.');
+}
+function duaList(){
+  menu('All duas',DUAS.map(d=>[d.n+(d===todayDua()?' (today)':''),`We say it ${d.when}.`,()=>duaCard(d,false)]));
+}
+function duaQuiz(){
+  const items=shuffle(DUAS).slice(0,5).map(d=>({q:`Which dua do we say ${d.when}?`,o:[d.ar,...shuffle(DUAS.filter(x=>x!==d)).slice(0,2).map(x=>x.ar)],a:d.ar,e:`${d.t}: “${d.m}”`,long:true}));
+  quiz('duas',{id:'duas',again:duaQuiz,title:'Which dua?',items});
+}
+
+/* letter match (Play Park) */
+const STAR='<svg width="28" height="28" viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="5" width="10" height="10" fill="currentColor" opacity=".55"/><rect x="5" y="5" width="10" height="10" fill="currentColor" opacity=".55" transform="rotate(45 10 10)"/></svg>';
+function matchGame(){
+  openSheet('Letter match');
+  const N=6, pairs=shuffle(LETTERS).slice(0,N), gen=sheetGen;
+  const cards=shuffle(pairs.flatMap(([g,n],p)=>[{p,t:g,ar:true},{p,t:n}]));
+  let open=[],found=0,moves=0,lock=false;
+  const b=body(`<p class="hint">Turn over two cards. Find each Arabic letter and its name.</p>
+    <div class="prog"><span>Pairs found: <b id="pf">0</b> of ${N}</span><span>Turns: <b id="mv">0</b></span></div>
+    <div class="mgrid">${cards.map((c,i)=>`<button class="mc" data-i="${i}" aria-label="Hidden card ${i+1}">${STAR}</button>`).join('')}</div><div id="fb"></div>`);
+  const el=i=>b.querySelector(`.mc[data-i="${i}"]`);say('Letter match. Turn over two cards. Find each Arabic letter and its name.');
+  const show=(i,up)=>{const e=el(i),c=cards[i];e.classList.toggle('up',up);e.classList.toggle('ar',up&&!!c.ar);e.innerHTML=up?esc(c.t):STAR;e.setAttribute('aria-label',up?c.t:'Hidden card '+(i+1));if(up&&c.ar)e.setAttribute('lang','ar');else e.removeAttribute('lang')};
+  b.querySelectorAll('.mc').forEach(e=>e.onclick=()=>{
+    const i=+e.dataset.i,c=cards[i]; if(lock||c.done||open.includes(i))return;
+    show(i,true);open.push(i);sfx('flip');if(!c.ar)say(c.t);if(open.length<2)return;
+    moves++;$('#mv').textContent=moves;
+    const [a,z]=open;
+    if(cards[a].p===cards[z].p){
+      sfx('right');cards[a].done=cards[z].done=true;[a,z].forEach(k=>{el(k).classList.add('done');el(k).disabled=true});open=[];found++;$('#pf').textContent=found;
+      if(found===N){const msg=reward('match',8,3);
+        say(`Masha Allah, you found them all in ${moves} turns!`);
+        $('#fb').innerHTML=`<p class="fb"><b>Masha’Allah, you found them all in ${moves} turns!</b> ${msg}</p><div class="row" style="margin-top:10px"><button class="btn" id="again">Play again</button><button class="btn alt" id="home">Back to town</button></div>`;
+        $('#again').onclick=matchGame;$('#home').onclick=closeSheet;$('#home').focus()}
+    }else{lock=true;setTimeout(()=>{if(gen!==sheetGen)return;sfx('wrong');show(a,false);show(z,false);open=[];lock=false},900)}
+  });
+}
+
+/* date harvest (Date Orchard) */
+function harvest(){
+  openSheet('Date harvest');
+  const P=[];for(const cx of [62,138])for(const [dx,dy] of [[-20,-8],[0,-12],[20,-8],[-20,14],[0,10],[20,14],[-10,34],[10,34]])P.push([cx+dx,118+dy]);
+  const ripeN=6+Math.floor(Math.random()*4), ripe=new Set(shuffle(P.map((_,i)=>i)).slice(0,ripeN)), D=GFX();
+  let got=0;
+  const fronds=[[28,92],[36,52],[66,24],[100,14],[134,24],[164,52],[172,92]];
+  const b=body(`<p class="hint">Tap only the ripe brown dates. Leave the green ones on the tree to grow.</p>
+    <div class="prog"><span>Picked <b id="got">0</b> of ${ripeN} ripe dates</span></div>
+    <svg class="palm" viewBox="0 0 200 230" role="group" aria-label="Date palm">
+      <rect y="206" width="200" height="24" fill="var(--ground)"/>${D?'<ellipse cx="100" cy="212" rx="40" ry="5" fill="rgba(0,0,0,.14)"/>':''}
+      <path d="M100 212 Q94 140 100 68" stroke="var(--wood)" stroke-width="16" fill="none" stroke-linecap="round"/>
+      ${D?'<path d="M100 212 Q94 140 100 68" stroke="rgba(0,0,0,.22)" stroke-width="16" fill="none" stroke-dasharray="2 9"/>':''}
+      ${fronds.map(([x,y])=>`<path d="M100 68 Q${(100+x)/2} ${Math.min(y,68)-18} ${x} ${y}" stroke="var(--leaf)" stroke-width="10" fill="none" stroke-linecap="round"/>`+(D?`<path d="M100 68 Q${(100+x)/2} ${Math.min(y,68)-18} ${x} ${y}" stroke="var(--leaf-dk)" stroke-width="1.5" fill="none"/>`:'')).join('')}
+      <path d="M100 76 Q80 84 62 102 M100 76 Q120 84 138 102" stroke="var(--gold-dk)" stroke-width="3" fill="none"/>
+      ${P.map(([x,y],i)=>`<g class="dt" data-i="${i}" tabindex="0" role="button" aria-label="${ripe.has(i)?'Ripe':'Green'} date"><circle class="hitc" cx="${x}" cy="${y}" r="10.5" fill="transparent"/><ellipse cx="${x}" cy="${y}" rx="6.5" ry="8.5" fill="${ripe.has(i)?'#7A3E14':'#9DBF4A'}"/>${D?`<ellipse cx="${x-2}" cy="${y-3}" rx="1.8" ry="2.6" fill="rgba(255,255,255,.35)"/>`:''}</g>`).join('')}
+    </svg><div id="fb"></div>`);
+  const tapDate=g=>{
+    const i=+g.dataset.i; if(g.classList.contains('fall'))return;
+    if(!ripe.has(i)){g.classList.remove('shake');void g.getBBox();g.classList.add('shake');sfx('wrong');toast('That one is still green. Let it ripen.');return}
+    sfx('pick');g.classList.add('fall');g.removeAttribute('tabindex');setTimeout(()=>g.remove(),matchMedia('(prefers-reduced-motion:reduce)').matches?0:500);
+    got++;$('#got').textContent=got;
+    if(got===ripeN){const msg=reward('harvest',6,2);say(`Masha Allah, you picked ${ripeN} dates! Sharing food with family and neighbours is a good deed.`);
+      $('#fb').innerHTML=`<p class="fb"><b>Masha’Allah, you picked ${ripeN} dates!</b> Sharing food with family and neighbours is a good deed. ${msg}</p><div class="row" style="margin-top:10px"><button class="btn" id="again">Pick again</button><button class="btn alt" id="home">Back to town</button></div>`;
+      $('#again').onclick=harvest;$('#home').onclick=closeSheet;$('#home').focus()}
+  };
+  say(`Date harvest. Pick the ${ripeN} ripe brown dates. Leave the green ones on the tree to grow.`);
+  const svg=b.querySelector('.palm');
+  svg.addEventListener('click',e=>{const g=e.target.closest('.dt');if(g)tapDate(g)});
+  svg.addEventListener('keydown',e=>{const g=e.target.closest('.dt');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();tapDate(g)}});
+}
+
+/* share the dates: simple sums made fresh every round */
+function mathQuiz(){
+  const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)), items=[];
+  for(let k=0;k<5;k++){
+    let q,a,e;const t=k%3;
+    if(t===0){const f=R(2,5),each=R(1,6),tot=f*each;q=`You picked ${tot} dates and share them equally between ${f} friends. How many does each friend get?`;a=each;e=`${tot} ÷ ${f} = ${each}`}
+    else if(t===1){const n=R(2,5),each=R(2,6);q=`There are ${n} baskets with ${each} dates in each. How many dates altogether?`;a=n*each;e=`${n} × ${each} = ${n*each}`}
+    else{const have=R(6,15),give=R(2,have-2);q=`You have ${have} dates and give ${give} to your neighbour. How many are left?`;a=have-give;e=`${have} − ${give} = ${have-give}`}
+    const wrong=shuffle([a+1,a-1,a+2,a-2,a+3].filter(v=>v>=0&&v!==a)).slice(0,2);
+    items.push({q,o:[a,...wrong].map(String),a:String(a),e});
+  }
+  quiz('math',{id:'math',again:mathQuiz,title:'Share the dates',items:shuffle(items)});
 }
 /* ---------- speech checking (works only where the browser allows the microphone) ---------- */
 const SRC=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -490,39 +884,78 @@ function alignWords(expected,heard){
   return {ok,score:n?ok.filter(Boolean).length/n:0};
 }
 function grade(expected,alts){let best={ok:[],score:-1};for(const a of alts){const r=alignWords(expected,a);if(r.score>best.score)best=r}return best}
-let lastGum='';
-async function listen(done){
+/* Android Chrome often ends a recognition session at once, before the child speaks.
+   So keep restarting until we hear something, then keep going until a short silence.
+   Recognition asks for the microphone itself: opening it first with getUserMedia
+   can make Android end the session straight away. */
+let lastLog='';
+function listen(done,opt={}){
   if(!SRC){done({err:'unsupported'});return}
-  const gen=sheetGen;
-  lastGum='skipped';
-  try{
-    if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
-      const st=await navigator.mediaDevices.getUserMedia({audio:true});
-      st.getTracks().forEach(t=>t.stop());lastGum='ok';
-    }
-  }catch(e){lastGum='denied-'+(e&&e.name||'error')}
-  if(gen!==sheetGen)return;
-  if(lastGum.startsWith('denied')){done({err:'not-allowed'});return}
-  let fin=false,rec;
-  const end=r=>{if(fin)return;fin=true;try{rec&&rec.abort()}catch(e){}if(gen===sheetGen)done(r)};
-  try{rec=new SRC()}catch(e){end({err:'unsupported'});return}
-  rec.lang='ar-SA';rec.interimResults=false;rec.maxAlternatives=3;rec.continuous=false;
-  rec.onresult=e=>end({alts:[...e.results[0]].map(a=>a.transcript)});
-  rec.onerror=e=>end({err:e.error});
-  rec.onend=()=>end({err:'no-speech'});
-  try{rec.start()}catch(e){end({err:'unsupported'});return}
-  setTimeout(()=>end({err:'no-speech'}),20000);
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  const gen=sheetGen,t0=Date.now(),LIMIT=opt.limit||25000,log=[];
+  let fin=false,rec=null,segs=[],interim='',gotNew=false,sessions=0,idle=0,cap=0;
+  const text=()=>[...segs.map(a=>a[0]),interim].join(' ').trim();
+  const alts=()=>{const t=text();if(!t)return null;const out=[t];
+    for(let k=1;k<3;k++)if(segs.some(a=>a[k]))out.push([...segs.map(a=>a[k]||a[0]),interim].join(' ').trim());return out};
+  const finish=err=>{
+    if(fin)return;fin=true;clearTimeout(cap);clearTimeout(idle);listen.stop=null;
+    try{rec&&rec.abort()}catch(e){}
+    lastLog=log.slice(-8).join(',')+' x'+sessions;
+    if(gen!==sheetGen)return;
+    const a=alts();done(a?{alts:a}:{err:err||'no-speech'});
+  };
+  const HARD=['not-allowed','service-not-allowed','audio-capture','network','language-not-supported','bad-grammar'];
+  const start=()=>{
+    if(fin)return;sessions++;gotNew=false;
+    try{rec=new SRC()}catch(e){finish('unsupported');return}
+    rec.lang='ar-SA';rec.interimResults=true;rec.maxAlternatives=3;rec.continuous=false;
+    rec.onresult=e=>{
+      clearTimeout(idle);interim='';
+      for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];
+        if(r.isFinal){segs.push([...r].map(x=>x.transcript));gotNew=true}else interim+=r[0].transcript+' '}
+      interim=interim.trim();if(interim)gotNew=true;
+      if(opt.onHear)opt.onHear(text());
+      if(opt.enough&&opt.enough(text()))finish();
+    };
+    rec.onerror=e=>{log.push(e.error);if(HARD.includes(e.error))finish(e.error)};
+    rec.onend=()=>{
+      log.push('end');if(fin)return;
+      if(interim){segs.push([interim]);interim=''}
+      const more=Date.now()-t0<LIMIT&&sessions<20;
+      if(!text()){more?setTimeout(start,120):finish('no-speech');return}
+      if(gotNew&&more){setTimeout(start,120);clearTimeout(idle);idle=setTimeout(()=>finish(),2500);return}
+      finish();
+    };
+    try{rec.start();log.push('start')}catch(e){finish('unsupported')}
+  };
+  cap=setTimeout(()=>finish(),LIMIT);
+  listen.stop=()=>finish();
+  start();
+}
+/* one microphone button: tap to start, tap again to finish early */
+function micButton(label,expected,onResult){
+  const m=$('#mic'),res=$('#res');
+  m.onclick=()=>{
+    if(listen.stop){listen.stop();return}
+    m.textContent='Listening… tap when you finish';m.classList.add('live');m.setAttribute('aria-pressed','true');
+    sfx('tap');
+    res.innerHTML='<p class="fb">Listening. Say it now.</p>';
+    listen(r=>{
+      m.textContent=label;m.classList.remove('live');m.setAttribute('aria-pressed','false');
+      if(r.err){res.innerHTML=`<p class="fb">${errMsg(r.err)}</p>`;sfx('wrong');return}
+      const g=grade(expected,r.alts);sfx(g.score>=PASS?'right':'wrong');onResult(g);
+    },{enough:t=>grade(expected,[t]).score>=1,onHear:t=>{const n=norm(t).length;res.innerHTML=`<p class="fb">Listening… I have heard ${n} word${n===1?'':'s'} so far.</p>`}});
+  };
 }
 function errMsg(c){
   const embedded=window.top!==window, secure=window.isSecureContext!==false, file=location.protocol==='file:', local=file||location.protocol==='content:';
-  const code=` <small>(code: ${esc(c)}, mic: ${esc(lastGum)}, ${embedded?'embedded':'own page'}, ${local?'saved file':'web page'}, ${secure?'secure':'not secure'})</small>`;
-  if(c==='no-speech')return 'I did not hear you. Tap the button and try again.';
+  const code=` <small>(code: ${esc(c)}, ${esc(lastLog)}, ${embedded?'embedded':'own page'}, ${local?'saved file':'web page'}, ${secure?'secure':'not secure'})</small>`;
+  if(c==='no-speech')return 'I did not hear you. Tap the button, wait a moment, then say it clearly close to the phone.'+code;
+  if(c==='language-not-supported')return 'Speech recognition on this device does not have Arabic. Add Arabic in your phone’s voice typing settings (on Android: Google voice typing, Languages), then try again. Your listener can confirm instead.'+code;
   if(c==='network')return 'Speech checking needs an internet connection.'+code;
   if(embedded)return 'This page is shown inside another page, and Chrome blocks the microphone there. Your listener can confirm instead. To use the microphone, open Madinati at its own https address.'+code;
   if(!secure)return 'Chrome only allows the microphone on secure https pages. Your listener can confirm instead. To use the microphone, put Madinati on a free https host.'+code;
   if(local)return 'Chrome does not give the microphone to a page opened from your Files or Downloads app. This is a Chrome rule, not a setting you can change. Your listener can confirm instead. To use the microphone, put Madinati on a free https web address.'+code;
-  if(lastGum.startsWith('denied'))return 'The microphone permission was refused. Tap the lock icon next to the web address, allow Microphone, then reload the page. Your listener can confirm instead.'+code;
-  if((c==='not-allowed'||c==='service-not-allowed')&&lastGum==='ok'&&file)return 'Chrome allowed the microphone but still blocks speech recognition for a page saved on your device. Put Madinati on a free https host to use the microphone. Your listener can confirm instead.'+code;
   if(c==='not-allowed'||c==='audio-capture')return 'The microphone is blocked. Tap the lock icon next to the web address, allow Microphone, then reload the page. Your listener can confirm instead.'+code;
   if(c==='service-not-allowed'||c==='unsupported')return 'Speech recognition is not available in this browser. Your listener can confirm instead.'+code;
   return 'I could not check that. Try again, or ask your listener.'+code;
@@ -537,35 +970,30 @@ function reciteMenu(){
   $('#sh-b').insertAdjacentHTML('afterbegin','<p class="note" style="margin-bottom:12px">The microphone check compares the words you say. It cannot judge tajweed, so a parent or teacher can also listen and confirm. Tajweed is best learned from a real teacher.</p>');
 }
 function recite(sid){
-  const sr=SURAHS.find(x=>x.id===sid);let i=0;
-  const CHK=['Every word was clear','The words were in the right order','The reader stopped at the end of the ayah'];
-  openSheet(sr.n);
+  const dua=DUAS.find(d=>d.id===sid), sr=SURAHS.find(x=>x.id===sid)||asText(dua);let i=0;
+  const CHK=['Every word was clear','The words were in the right order',sr.dua?'They said the whole dua':'The reader stopped at the end of the ayah'];
+  openSheet(sr.dua?'Practise: '+sr.n:sr.n);
   const show=()=>{
     let micPass=false;
-    const b=body(`<div class="prog"><span>Ayah ${i+1} of ${sr.a.length}</span><span>${esc(sr.m)}</span></div>
-      <p class="aya" id="ay" lang="ar" dir="rtl">${sr.a[i]}</p>
+    const b=body(`<div class="prog"><span>${sr.dua?'Dua':`Ayah ${i+1} of ${sr.a.length}`}</span><span>${sr.dua?'':esc(sr.m)}</span></div>
+      <p class="aya" id="ay" lang="ar" dir="rtl">${sr.a[i]}</p>${sr.t?`<p class="translit">${esc(sr.t)}</p>`:''}
       <button class="btn alt" id="mic">Record with microphone</button><div id="res"></div>
       <p class="hint">Or read it out loud and ask a listener to tick what they heard.</p>
       <div class="group">${CHK.map((t,k)=>`<button class="deed chk" role="checkbox" aria-checked="false" data-ck="${k}"><span class="box">${TICK}</span><span class="t">${t}</span></button>`).join('')}</div>
-      <button class="btn" id="ok" disabled>Next</button>`);
+      <button class="btn" id="ok" disabled>${sr.dua?'Done':'Next'}</button>`);
+    say(sr.dua?'Say the dua out loud, then tap record. Or ask a listener to tick what they heard.':`Ayah ${i+1} of ${sr.a.length}. Read it out loud, then tap record. Or ask a listener to tick what they heard.`);
     const upd=()=>{$('#ok').disabled=!(micPass||b.querySelectorAll('[data-ck][aria-checked="true"]').length>=CHK.length)};
     b.querySelectorAll('[data-ck]').forEach(el=>el.onclick=()=>{el.setAttribute('aria-checked',String(el.getAttribute('aria-checked')!=='true'));upd()});
-    $('#mic').onclick=()=>{
-      const m=$('#mic');m.disabled=true;m.textContent='Listening... recite now';
-      listen(r=>{
-        m.disabled=false;m.textContent='Record with microphone';
-        if(r.err){$('#res').innerHTML=`<p class="fb">${errMsg(r.err)}</p>`;return}
-        const g=grade(sr.a[i],r.alts);$('#ay').innerHTML=wordsHtml(sr.a[i],g.ok);
-        micPass=g.score>=PASS;
-        $('#res').innerHTML=`<p class="fb"><b>${micPass?'Masha’Allah, I heard it clearly.':'Not clear yet.'}</b> ${g.ok.filter(Boolean).length} of ${g.ok.length} words matched. ${micPass?'':'Green words matched. Try again.'}</p>`;
-        upd();
-      });
-    };
+    micButton('Record with microphone',sr.a[i],g=>{
+      $('#ay').innerHTML=wordsHtml(sr.a[i],g.ok);micPass=g.score>=PASS;
+      $('#res').innerHTML=`<p class="fb"><b>${micPass?'Masha’Allah, I heard it clearly.':'Not clear yet.'}</b> ${g.ok.filter(Boolean).length} of ${g.ok.length} words matched. ${micPass?'':'Green words matched. Try again.'}</p>`;
+      upd();
+    });
     $('#ok').onclick=()=>{i++;i<sr.a.length?show():done()};
   };
   const done=()=>{
-    S.rec=S.rec||{};S.rec[sid]=(S.rec[sid]||0)+1;const msg=reward('rec:'+sid,8,4);save();
-    body(`<p class="big">Masha’Allah!</p><p class="q" style="text-align:center">You recited all of ${esc(sr.n)}.</p><p class="fb" style="text-align:center">${msg}</p>
+    S.rec=S.rec||{};S.rec[sid]=(S.rec[sid]||0)+1;const msg=sr.dua?reward('dua:'+sid,6,3):reward('rec:'+sid,8,4);save();
+    body(`<p class="big">Masha’Allah!</p><p class="q" style="text-align:center">${sr.dua?'You practised the dua: '+esc(sr.n)+'.':'You recited all of '+esc(sr.n)+'.'}</p><p class="fb" style="text-align:center">${msg}</p>
       <div class="row"><button class="btn" id="again">Recite again</button><button class="btn alt" id="home">Back to town</button></div>`);
     $('#again').onclick=()=>recite(sid);$('#home').onclick=closeSheet;
   };
@@ -585,26 +1013,21 @@ function memCheck(sid){
       <p class="hint">Say this ayah from memory without looking. The words appear after you try.</p>
       <div class="row"><button class="btn" id="mic">Record from memory</button><button class="btn alt" id="hint">First word</button><button class="btn alt" id="rev">Show the ayah</button></div>
       <div id="res"></div><div id="lis"></div><button class="btn" id="ok" disabled>Next</button>`);
-    const ok=()=>{$('#ok').disabled=!pass};
+    const ok=()=>{$('#ok').disabled=!pass};say(`Ayah ${i+1} of ${sr.a.length}. Say it from memory without looking, then tap record.`);
     $('#hint').onclick=()=>{$('#ay').textContent=ay.split(' ')[0]+' …'};
     $('#rev').onclick=()=>{
       $('#ay').textContent=ay;
       $('#lis').innerHTML=`<p class="hint">Listener: did they say it without looking?</p><button class="deed chk" role="checkbox" aria-checked="false" id="lk"><span class="box">${TICK}</span><span class="t">Yes, they said it from memory</span></button>`;
       $('#lk').onclick=e=>{const c=e.currentTarget;c.setAttribute('aria-checked',String(c.getAttribute('aria-checked')!=='true'));pass=c.getAttribute('aria-checked')==='true';ok()};
     };
-    $('#mic').onclick=()=>{
-      const m=$('#mic');m.disabled=true;m.textContent='Listening... say it now';
-      listen(r=>{
-        m.disabled=false;m.textContent='Record from memory';
-        if(r.err){$('#res').innerHTML=`<p class="fb">${errMsg(r.err)}</p>`;return}
-        const g=grade(ay,r.alts);$('#ay').innerHTML=wordsHtml(ay,g.ok);pass=g.score>=PASS;
-        $('#res').innerHTML=`<p class="fb"><b>${pass?'Masha’Allah, you remembered it!':'Almost.'}</b> ${g.ok.filter(Boolean).length} of ${g.ok.length} words matched. ${pass?'':'Green words matched. Read the ayah, then try again.'}</p>`;ok();
-      });
-    };
+    micButton('Record from memory',ay,g=>{
+      $('#ay').innerHTML=wordsHtml(ay,g.ok);pass=g.score>=PASS;
+      $('#res').innerHTML=`<p class="fb"><b>${pass?'Masha’Allah, you remembered it!':'Almost.'}</b> ${g.ok.filter(Boolean).length} of ${g.ok.length} words matched. ${pass?'':'Green words matched. Read the ayah, then try again.'}</p>`;ok();
+    });
     $('#ok').onclick=()=>{i++;i<sr.a.length?show():done()};
   };
   const done=()=>{
-    const msg=reward('mem:'+sid,10,5);
+    S.mem[sid]=(S.mem[sid]||0)+1;const msg=reward('mem:'+sid,10,5);
     body(`<p class="big">Masha’Allah!</p><p class="q" style="text-align:center">You said all of ${esc(sr.n)} from memory.</p><p class="fb" style="text-align:center">${msg}</p>
       <div class="row"><button class="btn" id="again">Again</button><button class="btn alt" id="home">Back to town</button></div>`);
     $('#again').onclick=()=>memCheck(sid);$('#home').onclick=closeSheet;
@@ -626,7 +1049,7 @@ function dzikirCounter(){
     $('#tap').onclick=()=>{
       const now=performance.now();
       if(now-last<350){toast('Take your time. Say it first, then tap.');return}
-      last=now;c++;
+      last=now;c++;sfx('tap');
       if(c>=d.n){if(st<2){st++;c=0;toast('Step done. Next dhikr!');draw()}else finish()}else draw();
     };
     $('#tap').focus();
@@ -676,7 +1099,7 @@ function market(){
       <p class="note">You have ${S.coins} coins. You earn a star every time you give.</p>`);
     b.querySelectorAll('[data-g]').forEach(btn=>btn.onclick=()=>{
       const n=+btn.dataset.g; if(S.coins<n)return;
-      const before=Math.floor(S.given/50); S.coins-=n;S.given+=n;S.stars+=1;save();renderTop();
+      const before=Math.floor(S.given/50); S.coins-=n;S.given+=n;S.stars+=1;track('give');sfx('coin');renderTop();
       if(Math.floor(S.given/50)>before)toast('A new well was built. Jazakallahu khayran!');
       draw();
     });
@@ -731,12 +1154,12 @@ function pick(k,v){
   if(k==='skin')v=+v;
   const item=itemOf(k,v),o=OWN[k];
   if(item&&!owned(o[0]+':'+v,item.cost)){trial[k]=v;renderWardrobe();return}
-  delete trial[k];S[k]=v;save();renderTop();renderWardrobe();
+  sfx('tap');delete trial[k];S[k]=v;save();renderTop();renderWardrobe();
 }
 function buy(k){
   const v=trial[k],item=itemOf(k,v);if(!item)return;
   if(S.coins<item.cost){toast('You need '+(item.cost-S.coins)+' more coins. Try a quiz or Daily deeds.');return}
-  S.coins-=item.cost;S.owned.push(OWN[k][0]+':'+v);S[k]=v;delete trial[k];save();renderTop();renderWardrobe();toast(item.n+' unlocked!');
+  sfx('coin');S.coins-=item.cost;S.owned.push(OWN[k][0]+':'+v);S[k]=v;delete trial[k];save();renderTop();renderWardrobe();toast(item.n+' unlocked!');
 }
 function tryBar(){
   const ks=Object.keys(trial);
@@ -757,18 +1180,83 @@ function renderDeeds(){
 function toggleDeed(id){
   const t=S.deeds.t,i=t.indexOf(id);
   if(i<0){t.push(id);S.coins+=3}else{t.splice(i,1);S.coins=Math.max(0,S.coins-3)}
-  save();renderTop();renderDeeds();
+  dayLog().d=t.slice();sfx(i<0?'coin':'tap');save();renderTop();renderDeeds();
+}
+
+/* ---------- parent view (read only) ---------- */
+const ACT_N={order:'Order the prayer',wudu:'Steps of wudu',pillars:'Five pillars in order',dzikir:'Dzikir counter',match:'Letter match',harvest:'Date harvest',give:'Gave sadaqah'};
+const QUIZ_N={letters:'Arabic letters',duas:'Which dua?',math:'Share the dates'};
+const surahN=id=>(SURAHS.find(x=>x.id===id)||{n:id}).n, duaN=id=>(DUAS.find(x=>x.id===id)||{n:id}).n;
+function quizName(k){
+  if(DECKS[k])return DECKS[k].title;
+  if(k.startsWith('hifz:')){const ids=k.slice(5).split(',');return 'Hifz quiz: '+(ids.length===SURAHS.length?'Mixed review':ids.map(surahN).join(', '))}
+  return QUIZ_N[k]||k;
+}
+function actName(id){
+  const i=id.indexOf(':'),k=i<0?id:id.slice(0,i),v=id.slice(i+1);
+  if(k==='q')return quizName(v);
+  if(k==='rec')return 'Recited '+surahN(v);
+  if(k==='mem')return 'From memory: '+surahN(v);
+  if(k==='dua')return 'Practised dua: '+duaN(v);
+  return ACT_N[id]||id;
+}
+const dayKey=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+function lastDays(n){const out=[];for(let i=n-1;i>=0;i--){const d=new Date();d.setHours(12);d.setDate(d.getDate()-i);out.push({k:dayKey(d),d})}return out}
+const busy=h=>!!h&&(Object.keys(h.a||{}).length>0||(h.d||[]).length>0);
+function streak(){
+  let n=0;const d=new Date();d.setHours(12);
+  if(!busy(S.hist[dayKey(d)]))d.setDate(d.getDate()-1);
+  while(busy(S.hist[dayKey(d)])){n++;d.setDate(d.getDate()-1)}
+  return n;
+}
+function renderParents(){
+  const week=lastDays(7), lvl=Math.min(Math.floor(S.stars/10),LEVELS.length-1);
+  const active=week.filter(w=>busy(S.hist[w.k])).length;
+  const fmt=d=>d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'});
+  const [sy,sm,sd]=S.since.split('-').map(Number), since=new Date(sy,sm-1,sd);
+  const stat=(v,l)=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`;
+  const days=week.slice().reverse().map(w=>{
+    const h=S.hist[w.k]||{a:{},d:[]}, acts=Object.keys(h.a), deeds=(h.d||[]).length;
+    return `<div class="day"><b>${esc(fmt(w.d))}${w.k===today()?' (today)':''}</b>
+      <small>${acts.length||deeds?`${acts.length} ${acts.length===1?'activity':'activities'}, ${deeds} good ${deeds===1?'deed':'deeds'} ticked`:'Nothing recorded'}</small>
+      ${acts.length?`<small>${acts.map(a=>esc(actName(a))+(h.a[a]>1?' ×'+h.a[a]:'')).join(', ')}</small>`:''}</div>`}).join('');
+  const PR=DEEDS[0][1];
+  const prayers=`<div class="scroll"><table class="tbl"><thead><tr><th scope="col">Prayer</th>${week.map(w=>`<th scope="col" class="c">${esc(w.d.toLocaleDateString(undefined,{weekday:'narrow'}))}</th>`).join('')}<th scope="col" class="c">Days</th></tr></thead><tbody>
+    ${PR.map(([id,t])=>{const on=week.map(w=>((S.hist[w.k]||{}).d||[]).includes(id));
+      return `<tr><th scope="row">${esc(t.replace('Prayed ',''))}</th>${on.map(o=>`<td class="c ${o?'yes':'no'}">${o?'✓':'·'}</td>`).join('')}<td class="c">${on.filter(Boolean).length}/7</td></tr>`}).join('')}</tbody></table></div>`;
+  const quran=`<div class="scroll"><table class="tbl"><thead><tr><th scope="col">Surah</th><th scope="col" class="c">Recited</th><th scope="col" class="c">From memory</th><th scope="col" class="c">Hifz quiz best</th></tr></thead><tbody>
+    ${SURAHS.map(x=>{const b=S.best['hifz:'+x.id];return `<tr><th scope="row">${esc(x.n)}</th><td class="c">${(S.rec||{})[x.id]||0}</td><td class="c">${S.mem[x.id]||0}</td><td class="c">${b?b.s+' / '+b.n:'–'}</td></tr>`}).join('')}</tbody></table></div>`;
+  const qs=Object.keys(S.best).filter(k=>!/^hifz:[^,]+$/.test(k)).sort((a,b)=>quizName(a).localeCompare(quizName(b)));
+  const quizzes=qs.length?`<div class="scroll"><table class="tbl"><thead><tr><th scope="col">Quiz</th><th scope="col" class="c">Best</th><th scope="col" class="c">Last</th><th scope="col" class="c">Played</th></tr></thead><tbody>
+    ${qs.map(k=>{const b=S.best[k];return `<tr><th scope="row">${esc(quizName(k))}</th><td class="c">${b.s} / ${b.n}</td><td class="c">${b.last??'–'} / ${b.n}</td><td class="c">${b.t}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="hint">No quizzes finished yet.</p>';
+  const duas=`<div class="scroll"><table class="tbl"><thead><tr><th scope="col">Dua</th><th scope="col" class="c">Practised</th></tr></thead><tbody>
+    ${DUAS.map(d=>`<tr><th scope="row">${esc(d.n)}</th><td class="c">${(S.rec||{})[d.id]||0}</td></tr>`).join('')}</tbody></table></div>`;
+  $('#view').innerHTML=`
+  <section class="card"><h3>${S.name.trim()?esc(S.name.trim())+'’s progress':'Progress'}</h3>
+    <p class="hint">This page is for parents and teachers. Everything here stays on this device. Daily history started on ${esc(fmt(since))}.</p>
+    <div class="stats">${stat(lvl+1,'Level: '+LEVELS[lvl])}${stat(S.stars,'Stars of knowledge')}${stat(S.coins,'Coins to spend')}
+      ${stat(active+' / 7','Days active this week')}${stat(streak(),'Day streak')}${stat(S.given,'Coins given ('+Math.floor(S.given/50)+' wells)')}</div>
+    <button class="btn alt noprint" id="print">Print a progress sheet</button></section>
+  <section class="card"><h3>The last 7 days</h3><div>${days}</div></section>
+  <section class="card"><h3>Prayers ticked in Daily deeds</h3>${prayers}<p class="hint">Children tick these themselves, so treat them as a conversation starter.</p></section>
+  <section class="card"><h3>Qur’an</h3>${quran}<p class="hint">The microphone check compares words only. It cannot judge tajweed.</p></section>
+  <section class="card"><h3>Quiz scores</h3>${quizzes}</section>
+  <section class="card"><h3>Duas</h3>${duas}</section>`;
+  $('#print').onclick=()=>window.print();
 }
 
 /* ---------- wiring ---------- */
 function render(){
   if(tab!=='wardrobe')trial={};
   $$('.tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===tab)));
-  ({town:renderTown,wardrobe:renderWardrobe,deeds:renderDeeds})[tab]();
+  ({town:renderTown,wardrobe:renderWardrobe,deeds:renderDeeds,parents:renderParents})[tab]();
 }
 document.addEventListener('click',e=>{
-  const t=e.target.closest('.tabs button');if(t){tab=t.dataset.tab;render();return}
+  const t=e.target.closest('.tabs button');if(t){tab=t.dataset.tab;sfx('tap');stopAudio();render();return}
   const b=e.target.closest('.bld');if(b&&tab==='town'){goPlace(b.dataset.b);return}
+  const z=e.target.closest('#view [data-z]');if(z){if(z.dataset.z!==zone)goPlace('gate');return}
+  const sn=e.target.closest('#view [data-snd]');if(sn){S.sound=sn.dataset.snd;save();renderTown();sfx('right');say('The narrator is on. I will read the questions to you.');return}
+  const gx=e.target.closest('#view [data-gfx]');if(gx){S.gfx=gx.dataset.gfx;save();renderTown();return}
   const bu=e.target.closest('#view [data-buy]');if(bu){buy(bu.dataset.buy);return}
   const rm=e.target.closest('#view [data-rm]');if(rm){delete trial[rm.dataset.rm];renderWardrobe();return}
   const w=e.target.closest('#view [data-w]');if(w){wtab=w.dataset.w;renderWardrobe();return}
