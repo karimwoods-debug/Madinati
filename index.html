@@ -1,0 +1,787 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Madinati</title></head><body>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Fredoka:wght@500;600&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* Layout: one phone-width column. Header, three tabs (Town, Wardrobe, Daily Deeds), a town map you tap to walk to a place, and a bottom sheet for each activity. */
+:root{
+  --bg:#EAF1EE; --surface:#FFFFFF; --ink:#12302C; --muted:#56706B; --line:#CBDAD5;
+  --accent:#0E7C6B; --accent-ink:#FFFFFF; --gold:#C8962A; --good:#1B8A4B; --bad:#B4403A;
+  --sky1:#B7DDE6; --sky2:#E4F2EE; --ground:#CBE2C2; --path:#E6D6AE; --wall:#F2EAD6;
+  --display:'Fredoka','Trebuchet MS',system-ui,sans-serif;
+  --body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --arabic:'Amiri','Traditional Arabic','Noto Naskh Arabic',serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A1715; --surface:#13282A; --ink:#E3F0ED; --muted:#8FAAA5; --line:#264340;
+  --accent:#3FBFA6; --accent-ink:#04211B; --gold:#E0B24A; --good:#4CC384; --bad:#E57B72;
+  --sky1:#12303A; --sky2:#1B3D3E; --ground:#1D4232; --path:#5B5438; --wall:#D9D1BD; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1715; --surface:#13282A; --ink:#E3F0ED; --muted:#8FAAA5; --line:#264340;
+  --accent:#3FBFA6; --accent-ink:#04211B; --gold:#E0B24A; --good:#4CC384; --bad:#E57B72;
+  --sky1:#12303A; --sky2:#1B3D3E; --ground:#1D4232; --path:#5B5438; --wall:#D9D1BD; color-scheme:dark}
+
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font:16px/1.5 var(--body);background:var(--bg);color:var(--ink);
+  padding-block:10px 32px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;min-width:0}
+.brand h1{font-size:28px;line-height:1.1;letter-spacing:.01em}
+.brand small{color:var(--muted);font-size:13px}
+.chips{display:flex;gap:8px}
+.chip{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);
+  border-radius:999px;padding:5px 12px 5px 8px;font-weight:800;font-variant-numeric:tabular-nums}
+
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--surface);
+  border:1px solid var(--line);padding:5px;border-radius:14px}
+.tabs button{border:0;background:transparent;padding:10px 4px;border-radius:10px;font-weight:800;color:var(--muted);min-height:44px}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:18px}
+.hello{font-family:var(--display);font-size:20px;font-weight:500;text-wrap:balance}
+.hint{color:var(--muted);font-size:14px;margin:0}
+
+.scene{border-radius:18px;overflow:hidden;border:1px solid var(--line);background:var(--sky2)}
+.scene svg{display:block;width:100%;height:auto}
+.bld{cursor:pointer}
+.bld:focus-visible{outline:none}
+.bld:focus-visible .hit{stroke:var(--accent);stroke-width:3;fill:rgba(14,124,107,.12)}
+.bld:hover .hit{fill:rgba(14,124,107,.10)}
+.hit{fill:transparent;stroke:transparent;rx:10}
+.lbl{font:800 12px var(--body);fill:var(--ink);text-anchor:middle;paint-order:stroke;stroke:var(--sky2);stroke-width:3px;stroke-linejoin:round}
+.me{transition:transform .85s cubic-bezier(.4,.1,.2,1);pointer-events:none}
+
+.level{display:flex;flex-direction:column;gap:6px}
+.level b{font-family:var(--display);font-weight:500}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);border-radius:99px}
+
+label{font-weight:800;font-size:14px}
+input[type=text]{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:100%}
+.prevwrap{display:flex;justify-content:center;background:linear-gradient(var(--sky1),var(--sky2));border-radius:12px;padding:12px}
+.prev{width:150px;height:auto;max-width:100%}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button,.chipbtn{border:1px solid var(--line);background:var(--bg);padding:9px 16px;border-radius:999px;font-weight:800;min-height:44px}
+.seg button[aria-pressed="true"],.chipbtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.sw{width:46px;height:46px;border-radius:50%;border:2px solid var(--line);background:var(--c);position:relative;padding:0}
+.sw[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:2px}
+.sw .tag{position:absolute;right:-6px;bottom:-6px;background:var(--gold);color:#1a1405;font:800 11px var(--body);border-radius:99px;padding:1px 6px;border:1px solid var(--surface)}
+.note{font-size:14px;color:var(--muted);background:var(--bg);border-radius:10px;padding:10px 12px;margin:0}
+
+.deed{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px;min-height:52px}
+.deed .box{width:26px;height:26px;border-radius:8px;border:2px solid var(--muted);flex:none;display:grid;place-items:center}
+.deed[aria-checked="true"]{border-color:var(--good)}
+.deed[aria-checked="true"] .box{background:var(--good);border-color:var(--good);color:#fff}
+.deed[aria-checked="true"] span.t{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--muted)}
+.deed .box svg{display:none}
+.deed[aria-checked="true"] .box svg{display:block}
+.group{display:flex;flex-direction:column;gap:8px}
+.group>h3{font-size:15px;color:var(--muted);font-family:var(--body);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+
+/* sheet */
+#ov{position:fixed;inset:0;background:rgba(5,20,18,.55);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+.sheet{width:100%;max-width:560px;max-height:90vh;overflow:auto;background:var(--surface);color:var(--ink);
+  border-radius:22px 22px 0 0;border:1px solid var(--line);
+  padding:16px max(16px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:14px;animation:up .25s ease-out}
+@keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+.sh-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sh-head h2{font-size:22px}
+#sh-x{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-size:22px;line-height:1}
+.act{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;min-height:64px}
+.act b{font-family:var(--display);font-weight:500;font-size:18px}
+.act span{color:var(--muted);font-size:14px}
+.prog{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;font-weight:800}
+.q{font-family:var(--display);font-size:21px;font-weight:500;line-height:1.3;text-wrap:balance;margin:0}
+.choices{display:flex;flex-direction:column;gap:10px}
+.ch{width:100%;text-align:left;background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:13px 14px;min-height:54px;font-weight:800}
+.ch.ar{font-family:var(--arabic);font-size:40px;line-height:1.2;text-align:center;font-weight:700}
+.choices.grid{display:grid;grid-template-columns:1fr 1fr}
+.ch.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 16%,var(--bg))}
+.ch.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--bg))}
+.fb{margin:0;padding:10px 12px;border-radius:10px;background:var(--bg);font-size:15px}
+.btn{border:0;background:var(--accent);color:var(--accent-ink);font-weight:800;padding:13px 18px;border-radius:12px;min-height:50px}
+.btn.alt{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.big{font-family:var(--display);font-size:34px;text-align:center;margin:0}
+.steps{display:flex;flex-direction:column;gap:10px}
+.step{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:12px;min-height:54px;font-weight:800}
+.step .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--line);color:var(--muted);display:grid;place-items:center;font-size:14px}
+.step.ok{border-color:var(--good)}
+.step.ok .n{background:var(--good);color:#fff}
+.shake{animation:sh .35s}
+@keyframes sh{20%{transform:translateX(-6px)}60%{transform:translateX(6px)}}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);
+  padding:10px 16px;border-radius:12px;font-weight:800;font-size:14px;z-index:60;max-width:90vw;text-align:center}
+.foot{color:var(--muted);font-size:13px;text-align:center;margin:4px 0 0}
+
+.aya{font-family:var(--arabic);font-size:34px;line-height:1.9;text-align:center;margin:0;padding:12px;background:var(--bg);border-radius:12px}
+.ch.arl{font-family:var(--arabic);font-size:26px;line-height:1.7;direction:rtl;text-align:center;font-weight:700}
+.deed.chk[aria-checked="true"] span.t{text-decoration:none;color:var(--ink)}
+.ringwrap{position:relative;width:200px;height:200px;margin:0 auto}
+.ringwrap svg{position:absolute;inset:0}
+.tap{position:absolute;inset:24px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);font:600 44px var(--display);font-variant-numeric:tabular-nums}
+.tap:active{transform:scale(.97)}
+.seg.wt button{padding:8px 13px}
+.tryrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg);border:2px solid var(--gold);border-radius:12px;padding:10px 12px}
+.tryrow .btn{min-height:44px;padding:8px 16px}
+.w.ok{color:var(--good)}
+.w.bad{color:var(--bad);text-decoration:underline wavy}
+@media (prefers-reduced-motion:reduce){.me{transition:none}.sheet,.shake{animation:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>Madinati</h1><small>My city of learning</small></div>
+    <div class="chips">
+      <div class="chip" title="Barakah coins"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="var(--gold)"/><path d="M11.6 5.1a5 5 0 1 0 0 9.8 4 4 0 1 1 0-9.8z" fill="#fff"/></svg><span id="coins">0</span><span class="sr" hidden>coins</span></div>
+      <div class="chip" title="Stars of knowledge"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="4" width="12" height="12" fill="var(--accent)"/><rect x="4" y="4" width="12" height="12" fill="var(--accent)" transform="rotate(45 10 10)"/><circle cx="10" cy="10" r="2.6" fill="var(--surface)"/></svg><span id="stars">0</span></div>
+    </div>
+  </header>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" data-tab="town" aria-selected="true">Town</button>
+    <button role="tab" data-tab="wardrobe" aria-selected="false">Wardrobe</button>
+    <button role="tab" data-tab="deeds" aria-selected="false">Daily deeds</button>
+  </nav>
+  <main id="view"></main>
+  <p class="foot">No music, no chat with strangers, no ads. Questions cover the basics, so check anything new with a parent or teacher.</p>
+</div>
+
+<div id="ov" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t">
+  <div class="sh-head"><h2 id="sh-t"></h2><button id="sh-x" aria-label="Close">&times;</button></div>
+  <div id="sh-b"></div>
+</div></div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
+
+/* ---------- data ---------- */
+const SKIN=['#F6D5B8','#E7B98F','#C98E64','#9C6540','#6B432B'];
+const COLORS=[
+  {id:'forest',n:'Forest',c:'#1F6B4F',cost:0},{id:'navy',n:'Navy',c:'#27447F',cost:0},
+  {id:'plum',n:'Plum',c:'#6D3B70',cost:0},{id:'slate',n:'Slate',c:'#3E474D',cost:0},
+  {id:'white',n:'White',c:'#F1F1EC',cost:0},{id:'teal',n:'Teal',c:'#0E8A8C',cost:20},
+  {id:'rose',n:'Rose',c:'#B34E6F',cost:20},{id:'olive',n:'Olive',c:'#69782F',cost:25},
+  {id:'maroon',n:'Maroon',c:'#7B2D37',cost:25},{id:'sky',n:'Sky blue',c:'#4A8BC6',cost:30},{id:'mint',n:'Mint',c:'#5FB99A',cost:20},{id:'lavender',n:'Lavender',c:'#8E79C2',cost:20},{id:'mustard',n:'Mustard',c:'#C49A2C',cost:25},{id:'burgundy',n:'Burgundy',c:'#6E1F3A',cost:25},{id:'brown',n:'Brown',c:'#6B4A32',cost:25},{id:'coral',n:'Coral',c:'#D9705B',cost:30}];
+const SHOES=[{id:'black',n:'Black',c:'#2B2B2B',cost:0},{id:'brown',n:'Brown',c:'#6B4426',cost:0},{id:'white',n:'White',c:'#E8E8E2',cost:10},{id:'green',n:'Green',c:'#2F6B4B',cost:10},{id:'navy',n:'Navy',c:'#24366B',cost:10},{id:'maroon',n:'Maroon',c:'#6E2530',cost:10},{id:'tan',n:'Tan',c:'#B38B5D',cost:10}];
+const SSTYLE=[{id:'shoes',n:'Shoes',cost:0},{id:'sneakers',n:'Sneakers',cost:10},{id:'boots',n:'Boots',cost:15}];
+const HAND=[{id:'none',n:'Empty hands',cost:0},{id:'quran',n:"Qur'an",cost:15},{id:'tasbih',n:'Tasbih beads',cost:15},{id:'bottle',n:'Water bottle',cost:10},{id:'notebook',n:'Notebook',cost:10},{id:'lantern',n:'Lantern',cost:20},{id:'bouquet',n:'Flowers',cost:15},{id:'lunchbox',n:'Lunchbox',cost:10},{id:'dates',n:'Plate of dates',cost:15}];
+const BACK=[{id:'none',n:'Nothing',cost:0},{id:'bag',n:'School bag',cost:20},{id:'mat',n:'Prayer mat',cost:20},{id:'satchel',n:'Satchel',cost:25},{id:'rucksack',n:'Rucksack',cost:25},{id:'tote',n:'Cloth tote',cost:15}];
+const BADGE=[{id:'none',n:'None',cost:0},{id:'crescent',n:'Crescent',cost:10},{id:'star',n:'Star',cost:10},{id:'heart',n:'Heart',cost:10},{id:'mosque',n:'Mosque',cost:15},{id:'leaf',n:'Leaf',cost:10},{id:'diamond',n:'Diamond',cost:15}];
+const TRIM=[{id:'none',n:'Plain',cost:0,c:null},{id:'white',n:'White',cost:10,c:'#F4F4EE'},{id:'gold',n:'Gold',cost:15,c:'#E0B24A'},{id:'silver',n:'Silver',cost:15,c:'#C9D3D6'},{id:'emerald',n:'Emerald',cost:15,c:'#1F8F6B'},{id:'rose',n:'Rose',cost:15,c:'#E3919F'},{id:'dots',n:'Gold embroidery',cost:20,c:'#E0B24A'}];
+const HLEN=[{id:'regular',n:'Regular',cost:0},{id:'long',n:'Long',cost:10},{id:'layered',n:'Layered',cost:15}];
+const HATS=[{id:'kufi',n:'Kufi',cost:0},{id:'imamah',n:'Imamah',cost:0},{id:'taqiyah',n:'Taqiyah',cost:10},{id:'ghutra',n:'Ghutra',cost:15}];
+const PATTERN=[{id:'none',n:'Plain',cost:0},{id:'stripes',n:'Stripes',cost:10},{id:'stars',n:'Stars',cost:15},{id:'dots',n:'Dots',cost:10},{id:'checks',n:'Checks',cost:15}];
+const GLOVES=[{id:'none',n:'No gloves',cost:0},{id:'black',n:'Black',cost:10},{id:'match',n:'Match jilbab',cost:10},{id:'white',n:'White',cost:10}];
+const VEIL=[{id:'none',n:'Off',cost:0},{id:'niqab',n:'Niqab',cost:0}];
+const SURAHS=[
+ {id:'fatihah',n:'Al-Fatihah',m:'The Opening',a:['بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ','ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ','ٱلرَّحْمَٰنِ ٱلرَّحِيمِ','مَٰلِكِ يَوْمِ ٱلدِّينِ','إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ','ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ','صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ']},
+ {id:'ikhlas',n:'Al-Ikhlas',m:'Sincerity',a:['قُلْ هُوَ ٱللَّهُ أَحَدٌ','ٱللَّهُ ٱلصَّمَدُ','لَمْ يَلِدْ وَلَمْ يُولَدْ','وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ']},
+ {id:'falaq',n:'Al-Falaq',m:'The Daybreak',a:['قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ','مِن شَرِّ مَا خَلَقَ','وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ','وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِى ٱلْعُقَدِ','وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ']},
+ {id:'nas',n:'An-Nas',m:'Mankind',a:['قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ','مَلِكِ ٱلنَّاسِ','إِلَٰهِ ٱلنَّاسِ','مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ','ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ','مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ']},
+ {id:'kawthar',n:'Al-Kawthar',m:'The Abundance',a:['إِنَّآ أَعْطَيْنَٰكَ ٱلْكَوْثَرَ','فَصَلِّ لِرَبِّكَ وَٱنْحَرْ','إِنَّ شَانِئَكَ هُوَ ٱلْأَبْتَرُ']},
+ {id:'asr',n:'Al-Asr',m:'The Time',a:['وَٱلْعَصْرِ','إِنَّ ٱلْإِنسَٰنَ لَفِى خُسْرٍ','إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّٰلِحَٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ']}];
+const DZIKIR=[{ar:'سُبْحَانَ ٱللَّهِ',t:'SubhanAllah',m:'Glory be to Allah',n:33},{ar:'ٱلْحَمْدُ لِلَّهِ',t:'Alhamdulillah',m:'All praise is for Allah',n:33},{ar:'ٱللَّهُ أَكْبَرُ',t:'Allahu Akbar',m:'Allah is the Greatest',n:34}];
+const col=id=>(COLORS.find(c=>c.id===id)||COLORS[0]).c;
+const LEVELS=['Seed','Sprout','Sapling','Young tree','Strong tree','Garden'];
+
+const DECKS={
+  salah:{title:'Salah questions',items:[
+    {q:'How many prayers are obligatory every day?',o:['3','5','7'],a:'5',e:'Fajr, Dhuhr, Asr, Maghrib and Isha.'},
+    {q:'Which prayer is prayed at dawn?',o:['Fajr','Dhuhr','Maghrib'],a:'Fajr',e:'Fajr is prayed before sunrise. It has 2 rak’ahs.'},
+    {q:'How many rak’ahs is Maghrib?',o:['2','3','4'],a:'3',e:'Maghrib is prayed just after sunset and has 3 rak’ahs.'},
+    {q:'Which direction do Muslims face to pray?',o:['The Kaaba in Makkah','The sun','The nearest masjid'],a:'The Kaaba in Makkah',e:'This direction is called the Qiblah.'},
+    {q:'What do we do to be clean before salah?',o:['Wudu','Sleep','Travel'],a:'Wudu',e:'Wudu means washing the hands, mouth, nose, face, arms, feet and wiping the head.'}]},
+  quran:{title:'Qur’an questions',items:[
+    {q:'Which surah is the first in the Qur’an?',o:['Al-Fatihah','Al-Baqarah','Al-Ikhlas'],a:'Al-Fatihah',e:'Al-Fatihah means “The Opening”. We recite it in every rak’ah.'},
+    {q:'Who received the Qur’an from Allah?',o:['Prophet Muhammad ﷺ','Prophet Nuh','Prophet Yunus'],a:'Prophet Muhammad ﷺ',e:'It was revealed to him over about 23 years.'},
+    {q:'Which angel brought the revelation?',o:['Jibreel','Mikail','Israfil'],a:'Jibreel',e:'Jibreel (Gabriel) brought Allah’s words to the Prophet ﷺ.'},
+    {q:'What language was the Qur’an revealed in?',o:['Arabic','Latin','Persian'],a:'Arabic',e:'It is recited in Arabic all over the world.'},
+    {q:'How many surahs are in the Qur’an?',o:['99','114','30'],a:'114',e:'The first is Al-Fatihah and the last is An-Nas.'},
+    {q:'Surah Al-Ikhlas teaches that Allah is...',o:['One','Two','Three'],a:'One',e:'Allah is One. Al-Ikhlas is about pure belief in Him alone.'}]},
+  prophets:{title:'Stories of the Prophets',items:[
+    {q:'Who was the first prophet?',o:['Adam','Ibrahim','Musa'],a:'Adam',e:'Prophet Adam (peace be upon him) was also the first human.'},
+    {q:'Which prophet built the ark?',o:['Nuh','Dawud','Yusuf'],a:'Nuh',e:'Prophet Nuh built it by Allah’s command before the great flood.'},
+    {q:'Who built the Kaaba with his son Ismail?',o:['Ibrahim','Isa','Sulayman'],a:'Ibrahim',e:'Prophet Ibrahim and Prophet Ismail raised its walls together.'},
+    {q:'Which prophet was swallowed by a great fish?',o:['Yunus','Harun','Ayyub'],a:'Yunus',e:'He made dua inside the fish and Allah saved him.'},
+    {q:'Who was the last prophet?',o:['Muhammad ﷺ','Musa','Isa'],a:'Muhammad ﷺ',e:'He is the final messenger sent to all people.'},
+    {q:'Which prophet was given the Tawrah?',o:['Musa','Idris','Zakariyya'],a:'Musa',e:'Allah gave Prophet Musa the Tawrah for his people.'}]},
+  dzikir:{title:'Dzikir check',items:[
+    {q:'What does SubhanAllah mean?',o:['Glory be to Allah','All praise is for Allah','Allah is the Greatest'],a:'Glory be to Allah',e:'We say it to remember that Allah is perfect.'},
+    {q:'What does Alhamdulillah mean?',o:['All praise is for Allah','Glory be to Allah','I ask Allah for forgiveness'],a:'All praise is for Allah',e:'We say it to thank Allah.'},
+    {q:'What does Allahu Akbar mean?',o:['Allah is the Greatest','Allah is kind','Allah is near'],a:'Allah is the Greatest',e:'We say it in the call to prayer and in salah.'},
+    {q:'What does Astaghfirullah mean?',o:['I ask Allah for forgiveness','Allah is One','Peace be upon you'],a:'I ask Allah for forgiveness',e:'We say it when we make a mistake.'},
+    {q:'Which dhikr means \u201CThere is no god but Allah\u201D?',o:['La ilaha illallah','Bismillah','Yarhamukallah'],a:'La ilaha illallah',e:'It is the first part of the shahada.'},
+    {q:'After prayer, how many times do many Muslims say SubhanAllah?',o:['3','33','100'],a:'33',e:'33 SubhanAllah, 33 Alhamdulillah and 34 Allahu Akbar.'}]},
+  adab:{title:'Garden of Adab',items:[
+    {q:'What do we say when we meet a Muslim?',o:['Assalamu alaykum','Good luck','See you'],a:'Assalamu alaykum',e:'It means “peace be upon you”.'},
+    {q:'Someone says “Assalamu alaykum”. What do you reply?',o:['Wa alaykumus salam','Alhamdulillah','Bismillah'],a:'Wa alaykumus salam',e:'It means “and upon you be peace”.'},
+    {q:'What do we say before we start eating?',o:['Bismillah','Alhamdulillah','Subhanallah'],a:'Bismillah',e:'It means “In the name of Allah”.'},
+    {q:'What do you say after you sneeze?',o:['Alhamdulillah','Bismillah','Allahu Akbar'],a:'Alhamdulillah',e:'It means “All praise is for Allah”.'},
+    {q:'Your friend sneezes and says Alhamdulillah. You say...',o:['Yarhamukallah','Astaghfirullah','Ameen'],a:'Yarhamukallah',e:'It means “May Allah have mercy on you”.'},
+    {q:'Which hand do we use for eating?',o:['Right hand','Left hand','Either, it does not matter'],a:'Right hand',e:'The Prophet ﷺ taught us to eat with the right hand.'},
+    {q:'Allah commands us to be kind to...',o:['Our parents','Only our friends','Nobody'],a:'Our parents',e:'Being kind and respectful to parents is a big part of Islam.'}]}
+};
+const LETTERS=[['ا','Alif'],['ب','Ba'],['ت','Ta'],['ث','Tha'],['ج','Jeem'],['ح','Haa'],['خ','Khaa'],['د','Dal']];
+const PRAYER_STEPS=['Say “Allahu Akbar” and stand','Recite Al-Fatihah','Bow (Ruku)','Stand up from the bow','Place the forehead down (Sujud)','Sit, then make Sujud again'];
+const DEEDS=[
+  ['Prayers',[['fajr','Prayed Fajr'],['dhuhr','Prayed Dhuhr'],['asr','Prayed Asr'],['maghrib','Prayed Maghrib'],['isha','Prayed Isha']]],
+  ['Remembrance',[['morning','Morning adhkar'],['evening','Evening adhkar'],['quran','Read a little Qur’an']]],
+  ['Good character',[['parents','Helped my parents'],['smile','Smiled at someone (a smile is sadaqah)'],['salam','Said salam first']]]];
+const SPOTS={start:[180,306],masjid:[180,226],madrasa:[72,312],library:[288,312],garden:[72,438],market:[288,438]};
+
+/* ---------- state ---------- */
+const KEY='madinati-v1';
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
+let S=Object.assign({name:'',gender:'girl',skin:1,garment:'forest',head:'navy',hat:'kufi',hand:'none',back:'none',badge:'none',shoe:'black',sstyle:'shoes',trim:'none',hlen:'regular',vest:'none',pattern:'none',gloves:'none',veil:'none',rec:{},coins:10,stars:0,owned:[],done:{},deeds:{d:'',t:[]},given:0},load());
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+if(S.acc){if(S.acc==='quran')S.hand='quran';if(S.acc==='bag'||S.acc==='mat')S.back=S.acc;delete S.acc}
+S.owned=S.owned.map(k=>k.replace(/^acc:quran$/,'hand:quran').replace(/^acc:(bag|mat)$/,'back:$1'));
+if(S.deeds.d!==today())S.deeds={d:today(),t:[]};
+let tab='town', pos='start';
+
+/* ---------- avatar (faceless on purpose, modest clothing only) ---------- */
+let PID=0;
+const tint=(hex,a)=>{const n=parseInt(hex.slice(1),16),m=v=>Math.round(v+(255-v)*a);return '#'+[n>>16,(n>>8)&255,n&255].map(v=>m(v).toString(16).padStart(2,'0')).join('')};
+const PATS={stripes:[8,8,'<path d="M4 0 V8" stroke="rgba(255,255,255,.22)" stroke-width="1.6"/>'],stars:[14,14,'<path d="M7 2.5 L8.2 5.8 L11.5 7 L8.2 8.2 L7 11.5 L5.8 8.2 L2.5 7 L5.8 5.8Z" fill="rgba(255,255,255,.3)"/>'],dots:[10,10,'<circle cx="5" cy="5" r="1.4" fill="rgba(255,255,255,.3)"/>'],checks:[10,10,'<rect width="5" height="5" fill="rgba(255,255,255,.16)"/><rect x="5" y="5" width="5" height="5" fill="rgba(255,255,255,.16)"/>']};
+function avatar(s){
+  const sk=SKIN[s.skin],g=col(s.garment),h=col(s.head);
+  const sh=(SHOES.find(x=>x.id===s.shoe)||SHOES[0]).c;
+  const tc=(TRIM.find(x=>x.id===s.trim)||{}).c||null;
+  const girl=s.gender==='girl';
+  const vest=!girl&&s.vest&&s.vest!=='none'?col(s.vest):null;
+  const gl=girl?({black:'#2B2B2B',match:g,white:'#F1F1EC'})[s.gloves]:null, hc=gl||sk;
+  const pat=PATS[s.pattern], pid='pt'+(++PID);
+  const defs=pat?`<defs><pattern id="${pid}" patternUnits="userSpaceOnUse" width="${pat[0]}" height="${pat[1]}">${pat[2]}</pattern></defs>`:'';
+  const ov=d=>pat?`<path d="${d}" fill="url(#${pid})"/>`:'';
+  const A1='M31 60 L15 112 L26 115 L39 67Z', A2='M69 60 L85 112 L74 115 L61 67Z';
+  let back='',front='';
+  if(s.back==='bag')back='<rect x="58" y="66" width="28" height="38" rx="8" fill="#B5762B"/><rect x="62" y="80" width="20" height="10" rx="3" fill="#8F5A1F"/>';
+  if(s.back==='rucksack')back='<rect x="56" y="62" width="32" height="46" rx="10" fill="#2F6B4B"/><rect x="60" y="86" width="24" height="14" rx="4" fill="#244F38"/><rect x="62" y="66" width="20" height="4" rx="2" fill="#E0B24A"/>';
+  if(s.back==='mat')back='<g transform="rotate(18 66 88)"><rect x="60" y="58" width="12" height="60" rx="6" fill="#7C5AA6"/><rect x="60" y="68" width="12" height="4" fill="#E0B24A"/><rect x="60" y="104" width="12" height="4" fill="#E0B24A"/></g>';
+  if(s.back==='satchel')front+='<path d="M35 58 L68 112" stroke="#8F5A1F" stroke-width="3" fill="none"/><rect x="60" y="106" width="25" height="19" rx="4" fill="#B5762B"/><rect x="60" y="106" width="25" height="7" rx="3" fill="#8F5A1F"/><circle cx="72.5" cy="113" r="1.6" fill="#E0B24A"/>';
+  if(s.back==='tote')front+='<path d="M38 58 Q60 70 68 108" stroke="#C9B58A" stroke-width="2.5" fill="none"/><rect x="60" y="104" width="24" height="22" rx="3" fill="#E4D6B0"/><path d="M60 112 H84 M60 118 H84" stroke="#2F7A5C" stroke-width="1.5"/>';
+  const H=s.hand;
+  if(H==='quran')front+='<g transform="rotate(-8 79 108)"><rect x="70" y="98" width="17" height="22" rx="2" fill="#1B5E4A"/><rect x="72" y="100" width="13" height="18" rx="1" fill="none" stroke="#E0B24A" stroke-width="1"/><circle cx="78.5" cy="109" r="2.4" fill="none" stroke="#E0B24A" stroke-width=".8"/></g>';
+  if(H==='tasbih')front+='<path d="M79 117 Q92 124 84 142" stroke="#C8962A" fill="none" stroke-width="1"/>'+[[85,122],[88,127],[89,133],[86,138],[83,142]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="2.3" fill="#2F7A5C" stroke="#E0B24A" stroke-width=".5"/>`).join('')+'<path d="M83 144 L82 150" stroke="#E0B24A" stroke-width="1.6"/>';
+  if(H==='bottle')front+='<rect x="74" y="99" width="11" height="23" rx="3" fill="#4A8BC6"/><rect x="76" y="95" width="7" height="5" rx="1.5" fill="#2B2B2B"/><rect x="74" y="106" width="11" height="4" fill="rgba(255,255,255,.55)"/>';
+  if(H==='notebook')front+='<g transform="rotate(-6 79 108)"><rect x="71" y="100" width="16" height="21" rx="2" fill="#F1F1EC" stroke="#2B6B8A" stroke-width="1.2"/><path d="M74 106 H84 M74 110 H84 M74 114 H82" stroke="#2B6B8A" stroke-width=".9"/></g>';
+  if(H==='lantern')front+='<path d="M79 112 V103" stroke="#8A6A1F" stroke-width="1.2"/><path d="M73 112 H85 L83 128 H75Z" fill="#E0B24A"/><path d="M76 115 H82 L81 125 H77Z" fill="#FFF3B0"/><rect x="73" y="110" width="12" height="3" fill="#8A6A1F"/><rect x="75" y="128" width="8" height="2.5" fill="#8A6A1F"/>';
+  if(H==='bouquet')front+='<path d="M79 117 L74 98 M79 117 L79 96 M79 117 L85 99" stroke="#2F7A5C" stroke-width="1.4"/><circle cx="74" cy="96" r="3.4" fill="#E58AA5"/><circle cx="79" cy="93" r="3.4" fill="#F2C94C"/><circle cx="85" cy="97" r="3.4" fill="#E58AA5"/>';
+  if(H==='lunchbox')front+='<rect x="71" y="106" width="17" height="13" rx="3" fill="#E58A3A"/><rect x="71" y="106" width="17" height="4" rx="2" fill="#B8661F"/><path d="M75 106 V103 H84 V106" stroke="#B8661F" fill="none" stroke-width="1.2"/>';
+  if(H==='dates')front+='<ellipse cx="79" cy="118" rx="10" ry="3.2" fill="#F1F1EC" stroke="#9AA6A3" stroke-width=".6"/><circle cx="75" cy="115.5" r="2.4" fill="#5A3318"/><circle cx="79" cy="114.5" r="2.4" fill="#6B3E1C"/><circle cx="83" cy="115.5" r="2.4" fill="#5A3318"/>';
+  const bc=girl?h:(vest||g), bx=60, by=girl?72:68, B=s.badge, bg=`transform="translate(${bx} ${by})"`;
+  if(B==='crescent')front+=`<g ${bg}><circle r="4.6" fill="#E0B24A"/><circle cx="1.9" r="3.9" fill="${bc}"/></g>`;
+  if(B==='star')front+=`<g ${bg} fill="#E0B24A"><rect x="-3.4" y="-3.4" width="6.8" height="6.8"/><rect x="-3.4" y="-3.4" width="6.8" height="6.8" transform="rotate(45)"/></g>`;
+  if(B==='heart')front+=`<path ${bg} d="M0 3.4 C-6 -1.5 -3.4 -5.6 0 -2 C3.4 -5.6 6 -1.5 0 3.4Z" fill="#D9575F"/>`;
+  if(B==='mosque')front+=`<g ${bg} fill="#E0B24A"><path d="M-3.6 3 V-1 A3.6 3.6 0 0 1 3.6 -1 V3Z"/><rect x="-5.6" y="-4" width="1.6" height="7.4"/><rect x="4" y="-4" width="1.6" height="7.4"/></g>`;
+  if(B==='leaf')front+=`<path ${bg} d="M-4 3 Q-4 -4 4 -4 Q4 3 -4 3Z" fill="#4FA36B"/>`;
+  if(B==='diamond')front+=`<rect x="-3.5" y="-3.5" width="7" height="7" transform="translate(${bx} ${by}) rotate(45)" fill="#E0B24A"/>`;
+  const st=s.sstyle||'shoes'; let shoes;
+  if(st==='boots')shoes=`<rect x="29" y="139" width="18" height="13" rx="4" fill="${sh}"/><rect x="53" y="139" width="18" height="13" rx="4" fill="${sh}"/>`;
+  else if(st==='sneakers')shoes=`<ellipse cx="38" cy="152.5" rx="11" ry="3" fill="#F1F1EC"/><ellipse cx="62" cy="152.5" rx="11" ry="3" fill="#F1F1EC"/><ellipse cx="38" cy="150" rx="10" ry="4.5" fill="${sh}"/><ellipse cx="62" cy="150" rx="10" ry="4.5" fill="${sh}"/>`;
+  else shoes=`<ellipse cx="38" cy="151" rx="10" ry="4.5" fill="${sh}"/><ellipse cx="62" cy="151" rx="10" ry="4.5" fill="${sh}"/>`;
+  const arms=`<path d="${A1}" fill="${g}"/><path d="${A2}" fill="${g}"/>${ov(A1)}${ov(A2)}`;
+  const hands=`<circle cx="20.5" cy="117" r="5.5" fill="${hc}"/><circle cx="79.5" cy="117" r="5.5" fill="${hc}"/>`;
+  const cuffs=tc?`<path d="M17 106 L30 109.5 M83 106 L70 109.5" stroke="${tc}" stroke-width="3.5"/>`:'';
+  if(girl){
+    const REG='M50 12 C31 12 24 30 26 46 C19 58 17 80 21 98 Q50 106 79 98 C83 80 81 58 74 46 C76 30 69 12 50 12Z';
+    const LONG='M50 12 C31 12 24 30 26 46 C19 62 16 100 20 128 Q50 138 80 128 C84 100 81 62 74 46 C76 30 69 12 50 12Z';
+    const kh=s.hlen==='layered'?`<path d="${LONG}" fill="${tint(h,.5)}"/><path d="${REG}" fill="${h}"/>`:`<path d="${s.hlen==='long'?LONG:REG}" fill="${h}"/>`;
+    const BODY='M31 56 Q50 48 69 56 L83 148 Q50 157 17 148Z';
+    let hem='';
+    if(tc)hem=`<path d="M18 141 Q50 150 82 141" stroke="${tc}" stroke-width="3" fill="none"/>`+(s.trim==='dots'?[[27,136.5],[38.5,139],[50,139.8],[61.5,139],[73,136.5]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="1.8" fill="${tc}"/>`).join(''):'');
+    else hem='<path d="M19 142 Q50 151 81 142" stroke="rgba(255,255,255,.3)" stroke-width="2" fill="none"/>';
+    const veil=s.veil==='niqab'?`<ellipse cx="50" cy="38" rx="11.5" ry="14" fill="${h}"/><rect x="38.5" y="31" width="23" height="7" rx="3.5" fill="${sk}"/>`:'';
+    return `<g>${defs}${back}${shoes}<path d="${BODY}" fill="${g}"/>${ov(BODY)}
+    <path d="M37 92 L30 146 M63 92 L70 146" stroke="rgba(0,0,0,.1)" stroke-width="1.5"/>${hem}${arms}${cuffs}${kh}
+    <path d="M31 52 C27 70 27 86 30 96" stroke="rgba(255,255,255,.22)" stroke-width="2" fill="none"/><path d="M69 52 C73 70 73 86 70 96" stroke="rgba(0,0,0,.12)" stroke-width="2" fill="none"/>
+    <ellipse cx="50" cy="38" rx="11.5" ry="14" fill="${sk}" stroke="rgba(0,0,0,.14)"/>${veil}${hands}${front}</g>`;
+  }
+  const bandc=tc||'rgba(255,255,255,.5)', hs=s.hat;
+  let hat;
+  if(hs==='imamah')hat=`<path d="M63 26 Q73 34 69 52 L64 50 Q66 38 60 28Z" fill="${h}"/><ellipse cx="50" cy="22" rx="18" ry="10" fill="${h}"/><path d="M34 24 Q50 32 66 24" stroke="rgba(0,0,0,.22)" fill="none" stroke-width="2"/><path d="M36 18 Q50 10 64 18" stroke="${tc||'rgba(255,255,255,.4)'}" fill="none" stroke-width="2"/>`;
+  else if(hs==='taqiyah')hat=`<path d="M35 30 Q50 8 65 30Z" fill="${h}"/><path d="M38 26 H62 M41 21 H59" stroke="${bandc}" stroke-width="1.4"/>`;
+  else if(hs==='ghutra')hat=`<path d="M33 30 Q50 6 67 30 L74 54 Q66 50 62 46 L62 34 L38 34 L38 46 Q34 50 26 54Z" fill="${h}"/><ellipse cx="50" cy="20" rx="14" ry="3.2" fill="#2B2B2B"/>`;
+  else hat=`<path d="M35 30 Q50 6 65 30Z" fill="${h}"/><path d="M35 30 H65" stroke="${bandc}" stroke-width="2.4"/>`+(s.trim==='dots'?`<circle cx="50" cy="19" r="1.8" fill="${tc}"/><circle cx="43" cy="24" r="1.4" fill="${tc}"/><circle cx="57" cy="24" r="1.4" fill="${tc}"/>`:'');
+  const collar=tc?`<path d="M42 54 Q50 59 58 54 L58 60 Q50 65 42 60Z" fill="${tc}"/>`:'<path d="M43 55 Q50 60 57 55" stroke="rgba(0,0,0,.25)" stroke-width="1.5" fill="none"/>';
+  const placket=`<path d="M50 61 V90" stroke="${tc||'rgba(0,0,0,.22)'}" stroke-width="${tc?2:1.5}"/>`+(s.trim==='dots'?[[44,72],[56,72],[44,84],[56,84]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="1.6" fill="${tc}"/>`).join(''):'');
+  const hemB=tc?`<path d="M24 137 H76" stroke="${tc}" stroke-width="3"/>`:'<path d="M24 141 H76" stroke="rgba(255,255,255,.35)" stroke-width="2"/>';
+  const vestSvg=vest?`<path d="M33 58 L46 55 L48 112 L31 112Z" fill="${vest}"/><path d="M67 58 L54 55 L52 112 L69 112Z" fill="${vest}"/><circle cx="49.5" cy="72" r="1.4" fill="rgba(255,255,255,.6)"/><circle cx="49.5" cy="86" r="1.4" fill="rgba(255,255,255,.6)"/><circle cx="49.5" cy="100" r="1.4" fill="rgba(255,255,255,.6)"/>`:'';
+  const THOBE='M32 56 Q50 50 68 56 L76 142 L24 142Z';
+  return `<g>${defs}${back}<rect x="34" y="136" width="12" height="14" fill="#D8D5CA"/><rect x="54" y="136" width="12" height="14" fill="#D8D5CA"/>${shoes}
+    <rect x="44" y="46" width="12" height="14" fill="${sk}"/><circle cx="50" cy="34" r="15" fill="${sk}"/><path d="M35 32 Q50 16 65 32 Q50 24 35 32Z" fill="#2A1E17"/>
+    <path d="${THOBE}" fill="${g}"/>${ov(THOBE)}${vestSvg}${collar}${placket}${hemB}${arms}${cuffs}${hands}${hat}${front}</g>`;
+}
+
+/* ---------- top bar ---------- */
+function renderTop(){$('#coins').textContent=S.coins;$('#stars').textContent=S.stars}
+function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
+
+/* ---------- town ---------- */
+function renderTown(){
+  const lvl=Math.min(Math.floor(S.stars/10),LEVELS.length-1), into=S.stars%10, p=lvl>=LEVELS.length-1&&S.stars>=50?100:into*10;
+  const [x,y]=SPOTS[pos], nm=S.name.trim();
+  $('#view').innerHTML=`
+  <div class="hello">${nm?'Assalamu alaykum, '+esc(nm)+'!':'Assalamu alaykum!'} Tap a place to walk there.</div>
+  <div class="scene"><svg viewBox="0 0 360 456" role="group" aria-label="Town map">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky1)"/><stop offset="1" style="stop-color:var(--sky2)"/></linearGradient></defs>
+    <rect width="360" height="456" fill="url(#sky)"/>
+    <ellipse cx="60" cy="50" rx="30" ry="9" fill="var(--sky2)" opacity=".9"/><ellipse cx="300" cy="36" rx="34" ry="10" fill="var(--sky2)" opacity=".9"/>
+    <path d="M0 150 Q90 124 180 142 T360 136 V456 H0Z" fill="var(--ground)"/>
+    <g stroke="var(--path)" stroke-width="18" stroke-linecap="round" fill="none"><path d="M180 200 V306"/><path d="M72 306 H288"/><path d="M72 306 V440"/><path d="M288 306 V440"/></g>
+
+    <g class="bld" data-b="masjid" tabindex="0" role="button" aria-label="Masjid: learn about salah">
+      <rect class="hit" x="112" y="62" width="136" height="140"/>
+      <rect x="140" y="140" width="80" height="58" fill="var(--wall)"/>
+      <path d="M146 140 A34 34 0 0 1 214 140Z" fill="var(--accent)"/><path d="M180 98 V90" stroke="var(--gold)" stroke-width="3"/><circle cx="180" cy="87" r="4" fill="var(--gold)"/>
+      <rect x="122" y="104" width="14" height="94" fill="var(--wall)"/><rect x="224" y="104" width="14" height="94" fill="var(--wall)"/>
+      <path d="M120 104 L129 84 L138 104Z" fill="var(--accent)"/><path d="M222 104 L231 84 L240 104Z" fill="var(--accent)"/>
+      <path d="M169 198 V178 A11 11 0 0 1 191 178 V198Z" fill="var(--ink)"/>
+      <text class="lbl" x="180" y="72">Masjid</text></g>
+
+    <g class="bld" data-b="madrasa" tabindex="0" role="button" aria-label="Madrasa: Qur'an and Arabic letters">
+      <rect class="hit" x="22" y="196" width="100" height="100"/>
+      <rect x="36" y="236" width="72" height="56" fill="var(--wall)"/><path d="M30 236 L72 208 L114 236Z" fill="var(--accent)"/>
+      <path d="M64 292 V270 A8 8 0 0 1 80 270 V292Z" fill="var(--ink)"/>
+      <circle cx="48" cy="256" r="6" fill="var(--sky1)"/><circle cx="96" cy="256" r="6" fill="var(--sky1)"/>
+      <text class="lbl" x="72" y="200">Madrasa</text></g>
+
+    <g class="bld" data-b="library" tabindex="0" role="button" aria-label="Library: stories of the prophets">
+      <rect class="hit" x="238" y="196" width="100" height="100"/>
+      <rect x="252" y="236" width="72" height="56" fill="var(--wall)"/><path d="M246 236 L288 212 L330 236Z" fill="var(--gold)"/>
+      <g stroke="var(--accent)" stroke-width="4"><path d="M262 242 V292"/><path d="M280 242 V292"/><path d="M296 242 V292"/><path d="M314 242 V292"/></g>
+      <text class="lbl" x="288" y="204">Library</text></g>
+
+    <g class="bld" data-b="garden" tabindex="0" role="button" aria-label="Garden of Adab: good manners">
+      <rect class="hit" x="22" y="336" width="100" height="106"/>
+      <rect x="46" y="396" width="6" height="24" fill="#7A5430"/><rect x="94" y="402" width="6" height="18" fill="#7A5430"/>
+      <circle cx="49" cy="384" r="20" fill="var(--good)"/><circle cx="97" cy="392" r="15" fill="var(--good)" opacity=".85"/>
+      <g fill="var(--gold)"><circle cx="66" cy="418" r="3"/><circle cx="76" cy="422" r="3"/><circle cx="86" cy="417" r="3"/></g>
+      <text class="lbl" x="72" y="350">Garden of Adab</text></g>
+
+    <g class="bld" data-b="market" tabindex="0" role="button" aria-label="Sadaqah Market: giving">
+      <rect class="hit" x="238" y="336" width="100" height="106"/>
+      <rect x="256" y="390" width="64" height="30" fill="var(--wall)"/>
+      <path d="M250 372 H326 L320 392 H256Z" fill="var(--accent)"/><path d="M269 372 L265 392 H277 L281 372Z" fill="var(--gold)"/><path d="M297 372 L293 392 H305 L309 372Z" fill="var(--gold)"/>
+      <rect x="252" y="388" width="4" height="34" fill="#7A5430"/><rect x="320" y="388" width="4" height="34" fill="#7A5430"/>
+      <text class="lbl" x="288" y="360">Sadaqah Market</text></g>
+
+    <g class="me" id="me" style="transform:translate(${x-22.5}px,${y-68}px) scale(.45)">${avatar(S)}</g>
+  </svg></div>
+  <div class="card level"><div style="display:flex;justify-content:space-between;gap:8px"><b>Level ${lvl+1}: ${LEVELS[lvl]}</b><span class="hint">${S.stars} stars</span></div>
+    <div class="bar" role="progressbar" aria-valuenow="${p}" aria-valuemin="0" aria-valuemax="100"><i style="width:${p}%"></i></div>
+    <p class="hint">Stars show how much you have learned.</p></div>
+  <div class="card"><h3>How to earn coins</h3>
+    <div class="group"><p class="hint"><b>Quizzes:</b> 3 coins for each correct answer, once per quiz each day.</p>
+    <p class="hint"><b>Order the prayer</b> at the Masjid: 10 coins, once a day.</p>
+    <p class="hint"><b>Daily deeds:</b> 3 coins for every good deed you tick.</p></div>
+    <p class="hint">Spend coins in the Wardrobe on colours, trim, shoes and accessories. Give some at the Sadaqah Market too.</p></div>`;
+}
+const PLACES={masjid:'Masjid',madrasa:'Madrasa',library:'Library',garden:'Garden of Adab',market:'Sadaqah Market'};
+function goPlace(b){
+  pos=b; const me=$('#me'); if(!me)return; const [x,y]=SPOTS[b];
+  me.style.transform=`translate(${x-22.5}px,${y-68}px) scale(.45)`;
+  const delay=matchMedia('(prefers-reduced-motion:reduce)').matches?0:750;
+  setTimeout(()=>openPlace(b),delay);
+}
+
+/* ---------- sheet ---------- */
+let sheetGen=0;
+function openSheet(title){sheetGen++;$('#sh-t').textContent=title;$('#ov').hidden=false;$('#sh-x').focus()}
+function closeSheet(){sheetGen++;$('#ov').hidden=true;if(tab==='town')renderTown()}
+function body(html){const b=$('#sh-b');b.innerHTML=html;return b}
+function menu(title,items){
+  openSheet(title);
+  const b=body(items.map((it,i)=>`<button class="act" data-i="${i}" style="margin-bottom:10px"><b>${it[0]}</b><span>${it[1]}</span></button>`).join(''));
+  b.querySelectorAll('.act').forEach(btn=>btn.onclick=()=>items[+btn.dataset.i][2]());
+}
+function openPlace(b){
+  if(b==='masjid')menu('Masjid',[['Order the prayer','Put one rak\u2019ah in the right order',orderGame],['Salah questions','5 quick questions',()=>quiz('salah')],['Dzikir counter','33, 33 and 34 after prayer',dzikirCounter],['Dzikir check','What the words mean',()=>quiz('dzikir')]]);
+  if(b==='madrasa')menu('Madrasa',[['Recite with a listener','Microphone check or a listener confirms',reciteMenu],['Say it from memory','Hifz check with the text hidden',memMenu],['Hifz quiz','Which ayah comes next? Missing words',hifzMenu],['Qur\u2019an questions','The book of Allah',()=>quiz('quran')],['Arabic letters','Find the letter by its name',letterQuiz]]);
+  if(b==='library')quiz('prophets');
+  if(b==='garden')quiz('adab');
+  if(b==='market')market();
+}
+function reward(id,coins,stars){
+  if(S.done[id]===today())return 'Practice round. You already collected today’s reward here.';
+  S.done[id]=today();S.coins+=coins;S.stars+=stars;save();renderTop();
+  return `+${coins} coins, +${stars} stars`;
+}
+
+/* quiz engine */
+function quiz(id,custom){
+  const deck=custom||DECKS[id], list=shuffle(deck.items).slice(0,custom?deck.items.length:Math.min(5,deck.items.length)).map(q=>({...q,o:shuffle(q.o)}));
+  let i=0,score=0; openSheet(deck.title);
+  const ask=()=>{
+    const q=list[i];
+    const b=body(`<div class="prog"><span>Question ${i+1} of ${list.length}</span><span>${score} correct</span></div>
+      <p class="q">${esc(q.q)}</p>${q.pre?`<p class="aya" dir="rtl" lang="ar">${esc(q.pre)}</p>`:''}
+      <div class="choices ${q.big?'grid':''}">${q.o.map((o,k)=>`<button class="ch ${q.big?'ar':''} ${q.long?'arl':''}" data-k="${k}">${esc(o)}</button>`).join('')}</div><div id="fb"></div>`);
+    b.querySelectorAll('.ch').forEach(btn=>btn.onclick=()=>{
+      const pick=q.o[+btn.dataset.k], ok=pick===q.a;
+      b.querySelectorAll('.ch').forEach(c=>{c.disabled=true;if(q.o[+c.dataset.k]===q.a)c.classList.add('right')});
+      if(!ok)btn.classList.add('wrong'); else score++;
+      $('#fb').innerHTML=`<p class="fb"><b>${ok?'Masha’Allah, correct!':'Not this time.'}</b> ${esc(q.e)}</p><button class="btn" id="nx" style="margin-top:10px;width:100%">${i+1<list.length?'Next':'See result'}</button>`;
+      $('#nx').focus();$('#nx').onclick=()=>{i++;i<list.length?ask():finish()};
+    });
+  };
+  const finish=()=>{
+    const msg=reward('q:'+(custom?custom.id:id),score*3,score);
+    body(`<p class="big">${score} / ${list.length}</p>
+      <p class="q" style="text-align:center">${score===list.length?'Masha’Allah! Perfect.':score>=list.length/2?'Well done. Keep learning.':'Good effort. Try again to learn more.'}</p>
+      <p class="fb" style="text-align:center">${msg}</p>
+      <div class="row"><button class="btn" id="again">Play again</button><button class="btn alt" id="home">Back to town</button></div>`);
+    $('#again').onclick=()=>custom?custom.again():quiz(id);$('#home').onclick=closeSheet;
+  };
+  ask();
+}
+function letterQuiz(){
+  const items=shuffle(LETTERS).slice(0,5).map(([g,n])=>({q:`Tap the letter ${n}.`,a:g,o:shuffle(LETTERS.map(l=>l[0]).filter(x=>x!==g)).slice(0,3).concat(g),e:`${g} is ${n}.`,big:true}));
+  quiz('letters',{id:'letters',again:letterQuiz,title:'Arabic letters',items});
+}
+function orderGame(){
+  openSheet('Order the prayer');
+  let next=0; const order=shuffle(PRAYER_STEPS.map((t,i)=>({t,i})));
+  const b=body(`<p class="hint">Tap the steps of one rak’ah in the right order, starting with the first.</p>
+    <div class="steps">${order.map(s=>`<button class="step" data-i="${s.i}"><span class="n"></span><span>${esc(s.t)}</span></button>`).join('')}</div><div id="fb"></div>`);
+  b.querySelectorAll('.step').forEach(btn=>btn.onclick=()=>{
+    const i=+btn.dataset.i;
+    if(i===next){btn.classList.add('ok');btn.disabled=true;btn.querySelector('.n').textContent=++next;
+      if(next===PRAYER_STEPS.length){const msg=reward('order',10,5);
+        $('#fb').innerHTML=`<p class="fb"><b>Masha’Allah, that is one rak’ah!</b> Ask your teacher to show you the full prayer. ${msg}</p><button class="btn alt" id="home" style="margin-top:10px;width:100%">Back to town</button>`;$('#home').onclick=closeSheet}}
+    else{btn.classList.remove('shake');void btn.offsetWidth;btn.classList.add('shake');toast('Not yet. Think about step '+(next+1)+'.')}
+  });
+}
+/* ---------- speech checking (works only where the browser allows the microphone) ---------- */
+const SRC=window.SpeechRecognition||window.webkitSpeechRecognition;
+const norm=t=>t.replace(/[ؐ-ًؚ-ٰٟۖ-ۭـ]/g,'').replace(/[ٱآأإ]/g,'ا').replace(/[ىیئ]/g,'ي').replace(/ؤ/g,'و').replace(/ة/g,'ه').replace(/ک/g,'ك').replace(/[^ء-ي\s]/g,' ').split(/\s+/).filter(Boolean);
+function lev(a,b){const m=a.length,n=b.length,d=Array.from({length:m+1},(_,i)=>{const r=Array(n+1).fill(0);r[0]=i;return r});for(let j=1;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n]}
+function alignWords(expected,heard){
+  const E=norm(expected),H=norm(heard),n=E.length,m=H.length;
+  const sc=(a,b)=>lev(a,b)/Math.max(a.length,b.length);
+  const D=Array.from({length:n+1},()=>Array(m+1).fill(0));
+  for(let i=1;i<=n;i++)D[i][0]=i;for(let j=1;j<=m;j++)D[0][j]=j;
+  for(let i=1;i<=n;i++)for(let j=1;j<=m;j++)D[i][j]=Math.min(D[i-1][j]+1,D[i][j-1]+1,D[i-1][j-1]+sc(E[i-1],H[j-1]));
+  const ok=Array(n).fill(false);let i=n,j=m;
+  while(i>0&&j>0){
+    const s=sc(E[i-1],H[j-1]);
+    if(Math.abs(D[i][j]-(D[i-1][j-1]+s))<1e-9){ok[i-1]=s<=0.34;i--;j--}
+    else if(Math.abs(D[i][j]-(D[i-1][j]+1))<1e-9)i--;
+    else j--;
+  }
+  return {ok,score:n?ok.filter(Boolean).length/n:0};
+}
+function grade(expected,alts){let best={ok:[],score:-1};for(const a of alts){const r=alignWords(expected,a);if(r.score>best.score)best=r}return best}
+let lastGum='';
+async function listen(done){
+  if(!SRC){done({err:'unsupported'});return}
+  const gen=sheetGen;
+  lastGum='skipped';
+  try{
+    if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+      const st=await navigator.mediaDevices.getUserMedia({audio:true});
+      st.getTracks().forEach(t=>t.stop());lastGum='ok';
+    }
+  }catch(e){lastGum='denied-'+(e&&e.name||'error')}
+  if(gen!==sheetGen)return;
+  if(lastGum.startsWith('denied')){done({err:'not-allowed'});return}
+  let fin=false,rec;
+  const end=r=>{if(fin)return;fin=true;try{rec&&rec.abort()}catch(e){}if(gen===sheetGen)done(r)};
+  try{rec=new SRC()}catch(e){end({err:'unsupported'});return}
+  rec.lang='ar-SA';rec.interimResults=false;rec.maxAlternatives=3;rec.continuous=false;
+  rec.onresult=e=>end({alts:[...e.results[0]].map(a=>a.transcript)});
+  rec.onerror=e=>end({err:e.error});
+  rec.onend=()=>end({err:'no-speech'});
+  try{rec.start()}catch(e){end({err:'unsupported'});return}
+  setTimeout(()=>end({err:'no-speech'}),20000);
+}
+function errMsg(c){
+  const embedded=window.top!==window, secure=window.isSecureContext!==false, file=location.protocol==='file:', local=file||location.protocol==='content:';
+  const code=` <small>(code: ${esc(c)}, mic: ${esc(lastGum)}, ${embedded?'embedded':'own page'}, ${local?'saved file':'web page'}, ${secure?'secure':'not secure'})</small>`;
+  if(c==='no-speech')return 'I did not hear you. Tap the button and try again.';
+  if(c==='network')return 'Speech checking needs an internet connection.'+code;
+  if(embedded)return 'This page is shown inside another page, and Chrome blocks the microphone there. Your listener can confirm instead. To use the microphone, open Madinati at its own https address.'+code;
+  if(!secure)return 'Chrome only allows the microphone on secure https pages. Your listener can confirm instead. To use the microphone, put Madinati on a free https host.'+code;
+  if(local)return 'Chrome does not give the microphone to a page opened from your Files or Downloads app. This is a Chrome rule, not a setting you can change. Your listener can confirm instead. To use the microphone, put Madinati on a free https web address.'+code;
+  if(lastGum.startsWith('denied'))return 'The microphone permission was refused. Tap the lock icon next to the web address, allow Microphone, then reload the page. Your listener can confirm instead.'+code;
+  if((c==='not-allowed'||c==='service-not-allowed')&&lastGum==='ok'&&file)return 'Chrome allowed the microphone but still blocks speech recognition for a page saved on your device. Put Madinati on a free https host to use the microphone. Your listener can confirm instead.'+code;
+  if(c==='not-allowed'||c==='audio-capture')return 'The microphone is blocked. Tap the lock icon next to the web address, allow Microphone, then reload the page. Your listener can confirm instead.'+code;
+  if(c==='service-not-allowed'||c==='unsupported')return 'Speech recognition is not available in this browser. Your listener can confirm instead.'+code;
+  return 'I could not check that. Try again, or ask your listener.'+code;
+}
+const wordsHtml=(ay,ok)=>ay.split(' ').filter(Boolean).map((w,j)=>`<span class="w ${ok[j]?'ok':'bad'}">${w}</span>`).join(' ');
+const PASS=0.75;
+
+/* recitation with microphone or a listener */
+function reciteMenu(){
+  menu('Recite with a listener',SURAHS.map(s=>{const n=(S.rec&&S.rec[s.id])||0;
+    return [`${s.n} (${s.a.length} ayat)`,(n?`Recited ${n} time${n>1?'s':''}. `:'')+s.m,()=>recite(s.id)]}));
+  $('#sh-b').insertAdjacentHTML('afterbegin','<p class="note" style="margin-bottom:12px">The microphone check compares the words you say. It cannot judge tajweed, so a parent or teacher can also listen and confirm. Tajweed is best learned from a real teacher.</p>');
+}
+function recite(sid){
+  const sr=SURAHS.find(x=>x.id===sid);let i=0;
+  const CHK=['Every word was clear','The words were in the right order','The reader stopped at the end of the ayah'];
+  openSheet(sr.n);
+  const show=()=>{
+    let micPass=false;
+    const b=body(`<div class="prog"><span>Ayah ${i+1} of ${sr.a.length}</span><span>${esc(sr.m)}</span></div>
+      <p class="aya" id="ay" lang="ar" dir="rtl">${sr.a[i]}</p>
+      <button class="btn alt" id="mic">Record with microphone</button><div id="res"></div>
+      <p class="hint">Or read it out loud and ask a listener to tick what they heard.</p>
+      <div class="group">${CHK.map((t,k)=>`<button class="deed chk" role="checkbox" aria-checked="false" data-ck="${k}"><span class="box">${TICK}</span><span class="t">${t}</span></button>`).join('')}</div>
+      <button class="btn" id="ok" disabled>Next</button>`);
+    const upd=()=>{$('#ok').disabled=!(micPass||b.querySelectorAll('[data-ck][aria-checked="true"]').length>=CHK.length)};
+    b.querySelectorAll('[data-ck]').forEach(el=>el.onclick=()=>{el.setAttribute('aria-checked',String(el.getAttribute('aria-checked')!=='true'));upd()});
+    $('#mic').onclick=()=>{
+      const m=$('#mic');m.disabled=true;m.textContent='Listening... recite now';
+      listen(r=>{
+        m.disabled=false;m.textContent='Record with microphone';
+        if(r.err){$('#res').innerHTML=`<p class="fb">${errMsg(r.err)}</p>`;return}
+        const g=grade(sr.a[i],r.alts);$('#ay').innerHTML=wordsHtml(sr.a[i],g.ok);
+        micPass=g.score>=PASS;
+        $('#res').innerHTML=`<p class="fb"><b>${micPass?'Masha’Allah, I heard it clearly.':'Not clear yet.'}</b> ${g.ok.filter(Boolean).length} of ${g.ok.length} words matched. ${micPass?'':'Green words matched. Try again.'}</p>`;
+        upd();
+      });
+    };
+    $('#ok').onclick=()=>{i++;i<sr.a.length?show():done()};
+  };
+  const done=()=>{
+    S.rec=S.rec||{};S.rec[sid]=(S.rec[sid]||0)+1;const msg=reward('rec:'+sid,8,4);save();
+    body(`<p class="big">Masha’Allah!</p><p class="q" style="text-align:center">You recited all of ${esc(sr.n)}.</p><p class="fb" style="text-align:center">${msg}</p>
+      <div class="row"><button class="btn" id="again">Recite again</button><button class="btn alt" id="home">Back to town</button></div>`);
+    $('#again').onclick=()=>recite(sid);$('#home').onclick=closeSheet;
+  };
+  show();
+}
+/* say it from memory */
+function memMenu(){
+  menu('Say it from memory',SURAHS.map(s=>[s.n,`${s.a.length} ayat. The text stays hidden until you try.`,()=>memCheck(s.id)]));
+}
+function memCheck(sid){
+  const sr=SURAHS.find(x=>x.id===sid);let i=0;
+  openSheet('From memory: '+sr.n);
+  const show=()=>{
+    const ay=sr.a[i];let pass=false;
+    const b=body(`<div class="prog"><span>Ayah ${i+1} of ${sr.a.length}</span><span>${esc(sr.m)}</span></div>
+      <p class="aya" id="ay" lang="ar" dir="rtl">…</p>
+      <p class="hint">Say this ayah from memory without looking. The words appear after you try.</p>
+      <div class="row"><button class="btn" id="mic">Record from memory</button><button class="btn alt" id="hint">First word</button><button class="btn alt" id="rev">Show the ayah</button></div>
+      <div id="res"></div><div id="lis"></div><button class="btn" id="ok" disabled>Next</button>`);
+    const ok=()=>{$('#ok').disabled=!pass};
+    $('#hint').onclick=()=>{$('#ay').textContent=ay.split(' ')[0]+' …'};
+    $('#rev').onclick=()=>{
+      $('#ay').textContent=ay;
+      $('#lis').innerHTML=`<p class="hint">Listener: did they say it without looking?</p><button class="deed chk" role="checkbox" aria-checked="false" id="lk"><span class="box">${TICK}</span><span class="t">Yes, they said it from memory</span></button>`;
+      $('#lk').onclick=e=>{const c=e.currentTarget;c.setAttribute('aria-checked',String(c.getAttribute('aria-checked')!=='true'));pass=c.getAttribute('aria-checked')==='true';ok()};
+    };
+    $('#mic').onclick=()=>{
+      const m=$('#mic');m.disabled=true;m.textContent='Listening... say it now';
+      listen(r=>{
+        m.disabled=false;m.textContent='Record from memory';
+        if(r.err){$('#res').innerHTML=`<p class="fb">${errMsg(r.err)}</p>`;return}
+        const g=grade(ay,r.alts);$('#ay').innerHTML=wordsHtml(ay,g.ok);pass=g.score>=PASS;
+        $('#res').innerHTML=`<p class="fb"><b>${pass?'Masha’Allah, you remembered it!':'Almost.'}</b> ${g.ok.filter(Boolean).length} of ${g.ok.length} words matched. ${pass?'':'Green words matched. Read the ayah, then try again.'}</p>`;ok();
+      });
+    };
+    $('#ok').onclick=()=>{i++;i<sr.a.length?show():done()};
+  };
+  const done=()=>{
+    const msg=reward('mem:'+sid,10,5);
+    body(`<p class="big">Masha’Allah!</p><p class="q" style="text-align:center">You said all of ${esc(sr.n)} from memory.</p><p class="fb" style="text-align:center">${msg}</p>
+      <div class="row"><button class="btn" id="again">Again</button><button class="btn alt" id="home">Back to town</button></div>`);
+    $('#again').onclick=()=>memCheck(sid);$('#home').onclick=closeSheet;
+  };
+  show();
+}
+/* dzikir counter */
+function dzikirCounter(){
+  openSheet('Dzikir counter');
+  let st=0,c=0,last=0; const R=86,C=2*Math.PI*R;
+  const draw=()=>{
+    const d=DZIKIR[st];
+    body(`<div class="prog"><span>Step ${st+1} of 3</span><span>${c} / ${d.n}</span></div>
+      <p class="aya" lang="ar" dir="rtl">${d.ar}</p>
+      <p class="hint" style="text-align:center"><b>${d.t}</b>: ${d.m}</p>
+      <div class="ringwrap"><svg viewBox="0 0 200 200" width="200" height="200" aria-hidden="true"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--line)" stroke-width="10"/><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--gold)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-c/d.n)}" transform="rotate(-90 100 100)"/></svg>
+      <button class="tap" id="tap" aria-label="Count one, now ${c}">${c}</button></div>
+      <p class="hint" style="text-align:center">Say it, then tap once for each time. Many Muslims say these after every fard prayer.</p>`);
+    $('#tap').onclick=()=>{
+      const now=performance.now();
+      if(now-last<350){toast('Take your time. Say it first, then tap.');return}
+      last=now;c++;
+      if(c>=d.n){if(st<2){st++;c=0;toast('Step done. Next dhikr!');draw()}else finish()}else draw();
+    };
+    $('#tap').focus();
+  };
+  const finish=()=>{
+    const msg=reward('dzikir',10,5);
+    body(`<p class="big">Masha’Allah!</p><p class="q" style="text-align:center">You completed 33 SubhanAllah, 33 Alhamdulillah and 34 Allahu Akbar.</p><p class="fb" style="text-align:center">${msg}</p>
+      <div class="row"><button class="btn" id="again">Count again</button><button class="btn alt" id="home">Back to town</button></div>`);
+    $('#again').onclick=dzikirCounter;$('#home').onclick=closeSheet;
+  };
+  draw();
+}
+/* hifz quiz */
+function hifzItems(ids,n){
+  const pool=SURAHS.filter(s=>ids.includes(s.id)), all=SURAHS.flatMap(s=>s.a);
+  const words=[...new Set(all.join(' ').split(' '))].filter(w=>w.length>1);
+  const items=[],seen=new Set(); let guard=0;
+  while(items.length<n&&guard++<300){
+    const s=pool[Math.floor(Math.random()*pool.length)];
+    if(Math.random()<.5&&s.a.length>=2){
+      const i=Math.floor(Math.random()*(s.a.length-1)), key='n'+s.id+i; if(seen.has(key))continue; seen.add(key);
+      const right=s.a[i+1], wrong=shuffle(all.filter(a=>a!==right&&a!==s.a[i])).slice(0,2);
+      items.push({q:'Which ayah comes next?',pre:s.a[i],o:[right,...wrong],a:right,e:`That is ${s.n}, ayah ${i+2}. Keep repeating it with your teacher.`,long:true});
+    }else{
+      const i=Math.floor(Math.random()*s.a.length), w=s.a[i].split(' '); if(w.length<3)continue;
+      const k=Math.floor(Math.random()*w.length), key='m'+s.id+i+'-'+k; if(seen.has(key))continue; seen.add(key);
+      const right=w[k], wrong=shuffle(words.filter(x=>x!==right)).slice(0,3);
+      items.push({q:'Which word is missing?',pre:w.map((x,j)=>j===k?'_____':x).join(' '),o:[right,...wrong],a:right,e:`That is ${s.n}, ayah ${i+1}.`,big:true});
+    }
+  }
+  return items;
+}
+function hifzQuiz(ids,label){
+  quiz('hifz',{id:'hifz:'+ids.join(','),again:()=>hifzQuiz(ids,label),title:'Hifz: '+label,items:hifzItems(ids,5)});
+}
+function hifzMenu(){
+  menu('Hifz quiz',[...SURAHS.map(s=>[s.n,`${s.a.length} ayat. Which ayah comes next, and missing words.`,()=>hifzQuiz([s.id],s.n)]),['Mixed review','Questions from all six surahs',()=>hifzQuiz(SURAHS.map(s=>s.id),'Mixed review')]]);
+}
+function market(){
+  openSheet('Sadaqah Market');
+  const draw=()=>{
+    const wells=Math.floor(S.given/50), prog=(S.given%50)*2;
+    const b=body(`<p class="q">Share coins with a village well fund. Giving is a beautiful habit.</p>
+      <div class="level"><div style="display:flex;justify-content:space-between"><b>Wells built: ${wells}</b><span class="hint">${S.given%50} / 50 coins to the next well</span></div>
+      <div class="bar"><i style="width:${prog}%"></i></div></div>
+      <div class="row"><button class="btn" data-g="5" ${S.coins<5?'disabled':''}>Give 5 coins</button><button class="btn" data-g="10" ${S.coins<10?'disabled':''}>Give 10 coins</button></div>
+      <p class="note">You have ${S.coins} coins. You earn a star every time you give.</p>`);
+    b.querySelectorAll('[data-g]').forEach(btn=>btn.onclick=()=>{
+      const n=+btn.dataset.g; if(S.coins<n)return;
+      const before=Math.floor(S.given/50); S.coins-=n;S.given+=n;S.stars+=1;save();renderTop();
+      if(Math.floor(S.given/50)>before)toast('A new well was built. Jazakallahu khayran!');
+      draw();
+    });
+  };
+  draw();
+}
+
+/* ---------- wardrobe ---------- */
+let wtab='clothes', trial={};
+const cur=k=>trial[k]!==undefined?trial[k]:S[k];
+function owned(k,cost){return cost===0||S.owned.includes(k)}
+function swatches(kind,list,prefix){
+  return `<div class="swatches">${list.map(c=>{
+    const key=prefix+':'+c.id, ok=owned(key,c.cost);
+    return `<button class="sw" data-k="${kind}" data-v="${c.id}" style="--c:${c.c}" aria-pressed="${cur(kind)===c.id}" aria-label="${c.n}${ok?'':', '+c.cost+' coins'}">${ok?'':`<span class="tag">${c.cost}</span>`}</button>`}).join('')}</div>`;
+}
+function chips(kind,list,prefix){
+  return `<div class="seg">${list.map(a=>{const ok=owned(prefix+':'+a.id,a.cost);
+    return `<button data-k="${kind}" data-v="${a.id}" aria-pressed="${cur(kind)===a.id}">${a.n}${ok?'':' ('+a.cost+')'}</button>`}).join('')}</div>`;
+}
+function renderWardrobe(){
+  const girl=S.gender==='girl';
+  const TABS=[['body','Body'],['clothes','Clothes'],['head','Head'],['carry','Carry'],['feet','Feet']];
+  let p='';
+  if(wtab==='body')p=`<label>Character</label><div class="seg"><button data-k="gender" data-v="girl" aria-pressed="${girl}">Girl</button><button data-k="gender" data-v="boy" aria-pressed="${!girl}">Boy</button></div>
+    <label>Skin tone</label><div class="swatches">${SKIN.map((c,i)=>`<button class="sw" data-k="skin" data-v="${i}" style="--c:${c}" aria-pressed="${S.skin===i}" aria-label="Skin tone ${i+1}"></button>`).join('')}</div>`;
+  if(wtab==='clothes')p=`<label>${girl?'Jilbab (long, loose dress)':'Thobe (long robe)'} colour</label>${swatches('garment',COLORS,'col')}
+    <label>Pattern</label>${chips('pattern',PATTERN,'pat')}
+    <label>Trim and embroidery</label>${chips('trim',TRIM,'trim')}`+
+    (girl?`<label>Gloves</label>${chips('gloves',GLOVES,'glove')}`
+         :`<label>Waistcoat over the thobe</label><div class="seg"><button data-k="vest" data-v="none" aria-pressed="${cur('vest')==='none'}">None</button></div>${swatches('vest',COLORS,'col')}`);
+  if(wtab==='head')p=girl
+    ?`<label>Khimar (long headscarf) colour</label>${swatches('head',COLORS,'col')}
+      <label>Khimar style</label>${chips('hlen',HLEN,'hlen')}
+      <label>Face veil</label>${chips('veil',VEIL,'veil')}`
+    :`<label>Head covering</label>${chips('hat',HATS,'hat')}
+      <label>Colour</label>${swatches('head',COLORS,'col')}`;
+  if(wtab==='carry')p=`<label>In your hand</label>${chips('hand',HAND,'hand')}
+    <label>On your back</label>${chips('back',BACK,'back')}
+    <label>Badge</label>${chips('badge',BADGE,'badge')}`;
+  if(wtab==='feet')p=`<label>Shoe colour</label>${swatches('shoe',SHOES,'shoe')}
+    <label>Shoe style</label>${chips('sstyle',SSTYLE,'sstyle')}`;
+  $('#view').innerHTML=`
+  <section class="card"><div class="prevwrap"><svg class="prev" viewBox="0 0 100 160" role="img" aria-label="Your avatar">${avatar(Object.assign({},S,trial))}</svg></div>
+    ${tryBar()}<label for="nm">Your name</label><input id="nm" type="text" maxlength="16" value="${esc(S.name)}" placeholder="Type your name" autocomplete="off">
+    <p class="note">You have ${S.coins} coins. Tap a locked item to try it on before you buy. Earn coins from quizzes, recitation, dzikir and Daily deeds. Every outfit is loose and modest, avatars have no faces, and there is no music.</p></section>
+  <section class="card"><div class="seg wt" role="tablist" aria-label="Wardrobe sections">${TABS.map(t=>`<button role="tab" data-w="${t[0]}" aria-pressed="${wtab===t[0]}">${t[1]}</button>`).join('')}</div>${p}</section>`;
+}
+const OWN={garment:['col',COLORS],head:['col',COLORS],vest:['col',COLORS],shoe:['shoe',SHOES],sstyle:['sstyle',SSTYLE],hand:['hand',HAND],back:['back',BACK],badge:['badge',BADGE],trim:['trim',TRIM],hlen:['hlen',HLEN],hat:['hat',HATS],pattern:['pat',PATTERN],gloves:['glove',GLOVES],veil:['veil',VEIL]};
+function itemOf(k,v){const o=OWN[k];return o?o[1].find(x=>x.id===v):null}
+function pick(k,v){
+  if(k==='skin')v=+v;
+  const item=itemOf(k,v),o=OWN[k];
+  if(item&&!owned(o[0]+':'+v,item.cost)){trial[k]=v;renderWardrobe();return}
+  delete trial[k];S[k]=v;save();renderTop();renderWardrobe();
+}
+function buy(k){
+  const v=trial[k],item=itemOf(k,v);if(!item)return;
+  if(S.coins<item.cost){toast('You need '+(item.cost-S.coins)+' more coins. Try a quiz or Daily deeds.');return}
+  S.coins-=item.cost;S.owned.push(OWN[k][0]+':'+v);S[k]=v;delete trial[k];save();renderTop();renderWardrobe();toast(item.n+' unlocked!');
+}
+function tryBar(){
+  const ks=Object.keys(trial);
+  if(!ks.length)return '<p class="hint">Tap a locked item to try it on before you buy.</p>';
+  return ks.map(k=>{const it=itemOf(k,trial[k]),need=it.cost-S.coins;
+    return `<div class="tryrow"><span><b>Trying on: ${esc(it.n)}</b><br><small>${it.cost} coins${need>0?', you need '+need+' more':''}</small></span><span class="row"><button class="btn" data-buy="${k}" ${need>0?'disabled':''}>Buy</button><button class="btn alt" data-rm="${k}">Put back</button></span></div>`}).join('');
+}
+
+/* ---------- deeds ---------- */
+const TICK='<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function renderDeeds(){
+  const total=DEEDS.reduce((n,g)=>n+g[1].length,0), done=S.deeds.t.length;
+  $('#view').innerHTML=`<section class="card"><h3>Today I did...</h3>
+    <div class="level"><div style="display:flex;justify-content:space-between"><b>${done} of ${total} done</b><span class="hint">3 coins each</span></div><div class="bar"><i style="width:${done/total*100}%"></i></div></div>
+    <p class="note">Tick only what you really did. This list starts fresh every day.</p></section>
+    ${DEEDS.map(([g,items])=>`<div class="group"><h3>${g}</h3>${items.map(([id,t])=>`<button class="deed" role="checkbox" aria-checked="${S.deeds.t.includes(id)}" data-d="${id}"><span class="box">${TICK}</span><span class="t">${esc(t)}</span></button>`).join('')}</div>`).join('')}`;
+}
+function toggleDeed(id){
+  const t=S.deeds.t,i=t.indexOf(id);
+  if(i<0){t.push(id);S.coins+=3}else{t.splice(i,1);S.coins=Math.max(0,S.coins-3)}
+  save();renderTop();renderDeeds();
+}
+
+/* ---------- wiring ---------- */
+function render(){
+  if(tab!=='wardrobe')trial={};
+  $$('.tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===tab)));
+  ({town:renderTown,wardrobe:renderWardrobe,deeds:renderDeeds})[tab]();
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('.tabs button');if(t){tab=t.dataset.tab;render();return}
+  const b=e.target.closest('.bld');if(b&&tab==='town'){goPlace(b.dataset.b);return}
+  const bu=e.target.closest('#view [data-buy]');if(bu){buy(bu.dataset.buy);return}
+  const rm=e.target.closest('#view [data-rm]');if(rm){delete trial[rm.dataset.rm];renderWardrobe();return}
+  const w=e.target.closest('#view [data-w]');if(w){wtab=w.dataset.w;renderWardrobe();return}
+  const k=e.target.closest('#view [data-k]');if(k){pick(k.dataset.k,k.dataset.v);return}
+  const d=e.target.closest('[data-d]');if(d){toggleDeed(d.dataset.d);return}
+  if(e.target.id==='sh-x'||e.target.id==='ov')closeSheet();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&!$('#ov').hidden)closeSheet();
+  const b=e.target.closest&&e.target.closest('.bld');
+  if(b&&(e.key==='Enter'||e.key===' ')){e.preventDefault();goPlace(b.dataset.b)}
+});
+document.addEventListener('input',e=>{if(e.target.id==='nm'){S.name=e.target.value;save()}});
+renderTop();render();
+</script>
+</body></html>
