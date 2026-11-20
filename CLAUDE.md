@@ -5,7 +5,7 @@ A single-file web game for children aged 6-12. The player walks an avatar around
 ## Rules that must not change
 - Clothing is modest only. Girls wear a jilbab and khimar, boys wear a thobe with a head covering. There is no other clothing option.
 - Avatars have no faces.
-- No music and no sound of any kind.
+- No music
 - No chat with strangers, no ads, no tracking. Progress is stored in `localStorage` only.
 - Quiz and Arabic content must be reviewed by a teacher or scholar before children use it. Do not add content from memory without flagging it for review.
 
