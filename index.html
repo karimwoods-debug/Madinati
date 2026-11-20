@@ -208,7 +208,7 @@ input[type=text]{font:inherit;padding:11px 12px;border:1px solid var(--line);bor
     <button role="tab" data-tab="parents" aria-selected="false">Parents</button>
   </nav>
   <main id="view"></main>
-  <p class="foot">No music, no chat with strangers, no ads. Questions cover the basics, so check anything new with a parent or teacher.</p>
+  <p class="foot">No music, no chat with strangers, no ads. Questions cover the basics, so check anything new with a parent or teacher. <span id="ver"></span></p>
 </div>
 
 <div id="ov" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t">
@@ -218,6 +218,8 @@ input[type=text]{font:inherit;padding:11px 12px;border:1px solid var(--line);bor
 <div id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
+/* Change VERSION on every release, so a cached old copy is easy to spot. */
+const VERSION='2026-11-20.5';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -948,26 +950,32 @@ function micButton(label,expected,onResult){
         if((r.err==='not-allowed'||r.err==='service-not-allowed')&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
           res.innerHTML='<p class="fb">Checking the microphone…</p>';
           navigator.mediaDevices.getUserMedia({audio:true}).then(st=>{st.getTracks().forEach(t=>t.stop());return 'ok'},e=>'denied-'+(e&&e.name||'error'))
-            .then(probe=>{if(document.body.contains(res))res.innerHTML=`<p class="fb">${errMsg(r.err,probe)}</p>`});
+            .then(probe=>{if(probe==='ok'){S.noSR=true;save()}if(document.body.contains(res))res.innerHTML=`<p class="fb">${errMsg(r.err,probe)}</p>`});
           return}
         res.innerHTML=`<p class="fb">${errMsg(r.err)}</p>`;return}
+      if(S.noSR){delete S.noSR;save();const n=$('#nosr');if(n)n.remove()}
       const g=grade(expected,r.alts);sfx(g.score>=PASS?'right':'wrong');onResult(g);
     },{enough:t=>grade(expected,[t]).score>=1,onHear:t=>{const n=norm(t).length;res.innerHTML=`<p class="fb">Listening… I have heard ${n} word${n===1?'':'s'} so far.</p>`}});
   };
 }
+const HUAWEI=/huawei|honor|harmonyos|hmscore|huaweibrowser/i.test(navigator.userAgent);
+const noSRNote=()=>S.noSR?'<p class="note" id="nosr">Last time, the microphone check could not run on this device, so a listener can tick the boxes instead. You can still try the microphone.</p>':'';
 function errMsg(c,probe){
   const embedded=window.top!==window, secure=window.isSecureContext!==false, file=location.protocol==='file:', local=file||location.protocol==='content:';
-  const code=` <small>(code: ${esc(c)}, ${esc(lastLog)}${probe?', mic: '+esc(probe):''}, ${embedded?'embedded':'own page'}, ${local?'saved file':'web page'}, ${secure?'secure':'not secure'})</small>`;
+  const code=` <small>(code: ${esc(c)}, ${esc(lastLog)}${probe?', mic: '+esc(probe):''}, ${embedded?'embedded':'own page'}, ${local?'saved file':'web page'}, ${secure?'secure':'not secure'}, v${VERSION})</small>`;
   if(c==='no-speech')return 'I did not hear you. Tap the button, wait a moment, then say it clearly close to the phone.'+code;
   if(c==='language-not-supported')return 'Speech recognition on this device does not have Arabic. Add Arabic in your phone’s voice typing settings (on Android: Google voice typing, Languages), then try again. Your listener can confirm instead.'+code;
   if(c==='network')return 'Speech checking needs an internet connection.'+code;
   if(embedded)return 'This page is shown inside another page, and Chrome blocks the microphone there. Your listener can confirm instead. To use the microphone, open Madinati at its own https address.'+code;
   if(!secure)return 'Chrome only allows the microphone on secure https pages. Your listener can confirm instead. To use the microphone, put Madinati on a free https host.'+code;
   if(local)return 'Chrome does not give the microphone to a page opened from your Files or Downloads app. This is a Chrome rule, not a setting you can change. Your listener can confirm instead. To use the microphone, put Madinati on a free https web address.'+code;
-  if(probe==='ok'&&(c==='not-allowed'||c==='service-not-allowed'))return `Chrome can use the microphone, but your phone’s speech recognition service refused. Your listener can confirm instead. On Android, try these:
-    <ol style="margin:6px 0 0;padding-left:20px"><li>Settings, Apps, <b>Google</b>, Permissions, Microphone: Allow. Do the same for “Speech Services by Google” if your phone has it.</li>
-    <li>Open Madinati in the <b>Chrome app</b> itself, not from a link inside WhatsApp, Gmail or another app.</li>
-    <li>Settings, System, Languages and input: turn on <b>Google voice typing</b> and add <b>Arabic</b>.</li></ol>`+code;
+  if(probe==='ok'&&(c==='not-allowed'||c==='service-not-allowed')){
+    const steps=`<ol style="margin:6px 0 0;padding-left:20px"><li>Settings, Apps, <b>Google</b>, Permissions, Microphone: Allow. Do the same for “Speech Services by Google” if it is there.</li>
+      <li>Open Madinati in the <b>Chrome app</b> itself, not from a link inside WhatsApp, Gmail or another app.</li>
+      <li>Settings, System, Languages and input: turn on <b>Google voice typing</b> and add <b>Arabic</b>.</li></ol>`;
+    const head=`<b>The microphone check cannot run on this device.</b> The microphone works, but the device has no working speech recognition service for the browser to use. This is common on Huawei and Honor tablets and phones, which do not include Google services. Use the listener check below instead, or try the microphone check on a phone or computer with Google Chrome.`;
+    return HUAWEI?head+code:head+`<br><br>If this device does have Google services, try these:${steps}`+code;
+  }
   if(c==='not-allowed'||c==='audio-capture')return 'The microphone is blocked. Tap the lock icon next to the web address, allow Microphone, then reload the page. Your listener can confirm instead.'+code;
   if(c==='service-not-allowed'||c==='unsupported')return 'Speech recognition is not available in this browser. Your listener can confirm instead.'+code;
   return 'I could not check that. Try again, or ask your listener.'+code;
@@ -989,7 +997,7 @@ function recite(sid){
     let micPass=false;
     const b=body(`<div class="prog"><span>${sr.dua?'Dua':`Ayah ${i+1} of ${sr.a.length}`}</span><span>${sr.dua?'':esc(sr.m)}</span></div>
       <p class="aya" id="ay" lang="ar" dir="rtl">${sr.a[i]}</p>${sr.t?`<p class="translit">${esc(sr.t)}</p>`:''}
-      <button class="btn alt" id="mic">Record with microphone</button><div id="res"></div>
+      <button class="btn alt" id="mic">Record with microphone</button>${noSRNote()}<div id="res"></div>
       <p class="hint">Or read it out loud and ask a listener to tick what they heard.</p>
       <div class="group">${CHK.map((t,k)=>`<button class="deed chk" role="checkbox" aria-checked="false" data-ck="${k}"><span class="box">${TICK}</span><span class="t">${t}</span></button>`).join('')}</div>
       <button class="btn" id="ok" disabled>${sr.dua?'Done':'Next'}</button>`);
@@ -1024,7 +1032,7 @@ function memCheck(sid){
       <p class="aya" id="ay" lang="ar" dir="rtl">…</p>
       <p class="hint">Say this ayah from memory without looking. The words appear after you try.</p>
       <div class="row"><button class="btn" id="mic">Record from memory</button><button class="btn alt" id="hint">First word</button><button class="btn alt" id="rev">Show the ayah</button></div>
-      <div id="res"></div><div id="lis"></div><button class="btn" id="ok" disabled>Next</button>`);
+      ${noSRNote()}<div id="res"></div><div id="lis"></div><button class="btn" id="ok" disabled>Next</button>`);
     const ok=()=>{$('#ok').disabled=!pass};say(`Ayah ${i+1} of ${sr.a.length}. Say it from memory without looking, then tap record.`);
     $('#hint').onclick=()=>{$('#ay').textContent=ay.split(' ')[0]+' …'};
     $('#rev').onclick=()=>{
@@ -1283,5 +1291,6 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='nm'){S.name=e.target.value;save()}});
 renderTop();render();
+$('#ver').textContent='Version '+VERSION+'.';
 </script>
 </body></html>
